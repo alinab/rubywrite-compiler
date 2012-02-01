@@ -1,6 +1,6 @@
 int main()
 {
-  int a,b
+  int a,b;
   a = 12;
   b = 13;
   if (a > 10 || b < 12) {

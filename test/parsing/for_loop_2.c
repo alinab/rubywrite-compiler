@@ -1,9 +1,9 @@
 int main()
 {
-  int a
-  double b
-  char c
-  int d
+  int a;
+  double b;
+  char c;
+  int d;
   a =  2;
   c = "1"; /*Char const */
   for (b = 2.0; b < 100.0 ; b = b + 2.0) {

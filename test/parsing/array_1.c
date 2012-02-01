@@ -1,8 +1,9 @@
 /*void foo(int *a);*/
 int main()
 {
-  int a[10],i
-  int b
+  int a[10];
+  int i;
+  int b;
   b = a;
   foo(b);
   for(i = 0;i < 10;i = i + 1){
@@ -13,7 +14,7 @@ int main()
 
 void foo(int c)
 {
-  int i
+  int i;
   for(i = 0;i < 10;i = i + 1){
     c[i] = i * 2 * (1 + i /2 + i / 3);
   }

@@ -1,9 +1,9 @@
 void foo(char a)
 int main()
 {
-  int i
-  char b
-  char a[20] 
+  int i;
+  char b;
+  char a[20];
   a[20] = "This is a string";
   b = a;
   i = 0;
@@ -18,7 +18,7 @@ int main()
 
 void foo(char c)
 {
-  int i
+  int i;
   i = 0;
   while(c[i] != NULL){
     c[i] = c[i] + 1;

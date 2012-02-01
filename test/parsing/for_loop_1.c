@@ -1,8 +1,8 @@
 int main()
 {
-  int a
-  double b
-  char c
+  int a;
+  double b;
+  char c;
   a =  2;
   c = "1"; /*const char written with " "*/
   for (b = 2.0; b < 20.0 ; b = b + 2.0) {

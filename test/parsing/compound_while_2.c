@@ -1,6 +1,6 @@
 int main()
 {
-  int a,b,c
+  int a,b,c;
   a = 2;
   b = 3;
   c = 5;
@@ -11,5 +11,5 @@ int main()
       break ;
     }
     else 
-  }
+    }
 }

@@ -1,15 +1,15 @@
 int main()
 {
-  int a[10],b,c,*d,*e
-  int *r
+  int a[10];
+  int b,c;
+  int *d;
+  int *r;
+  *t = 9;
   b = 10;
   c = 3;
   d = &c;
   e = &b;
-  5.0;
-  5;
   (5 + 5);
-  "www";
   foo();
   (foo(a));
   !(b);

@@ -1,6 +1,6 @@
 int main()
 {
-  int a,b
+  int a,b;
   a = "s"; /* all char constants are written in " "*/
   b = 1;
   while(b < 10) {

@@ -32,3 +32,8 @@ This ensures that Ruby finds all the files to load.  Alternatively you may defin
 
 The code is run by passing it to Ruby interpreter.
   $ ruby parsetest.rb < test/parsing/example0.c
+  ------------------------------------------------------------------------------------
+  File pcc.rb needs to be run as:
+  $ ruby pcc.rb -p input_file #parsed output
+
+  $ ruby pcc.rb input_file #unparsed_output

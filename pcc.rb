@@ -32,23 +32,22 @@ class UnparsePidginC
     boxer = ShadowBoxing.new  do
       rule :Program  do | body|
         v({:is => 2},
-          h({},
-            body)
+          v({},
+            *body.children)
        )
       end
       rule :Function do |retvals, name, args, body|
-        v({:is => 2},
-          h({},
-                "function ",
-            "(", h_star({}, ", ", retvals), ") = ",
+        v({:is => 0},
+          h({:hs => 1},
+           h_star({}, " , ", retvals), 
                 name,
             "(", h_star({}, ", ", args), ")"),
             body)
       end
-      rule :Block do |stmts| v({}, *stmts.children)
-      end
-      rule :Assignment do |lhs, op, rhs|
-        h({:hs => 1}, lhs, op, rhs)
+      rule :Block do |block| 
+      v({  },'{' ,*block.children ,'}') end
+      rule :Assignment do |lhs,rhs|
+        h({:hs => 2}, lhs,'=', rhs)
       end
       rule :BinaryOp do |rand1, op, rand2|
         h({:hs => 1}, rand1, op, rand2)
@@ -89,14 +88,14 @@ class UnparsePidginC
       rule :PointerDecl do |pointer_var|
         h({},'*', pointer_var)
       end
-      rule :ArrayRef do |type|
-        h({}, type)
+      rule :ArrayRef do |name,args|
+        h({},name,'[',*args.children,']')
       end
       rule :FunctionCall do |func, args|
         h({}, func, "(", args, ")")
       end
       rule :Formals do |args|
-        h({}, *args.children)
+        v({}, *args.children)
       end
       rule :ConstInt do |num|
         h({}, num)
@@ -109,6 +108,15 @@ class UnparsePidginC
       end
       rule :Identifier do |i|
         h({}, i)
+      end
+      rule :PointerAssignment do |p_var|
+        v({}, p_var)
+      end
+      rule :TypeDecl do |t_var|
+        h({}, t_var)
+      end
+      rule :FunctionCall do |func_call|
+        h({}, func_call)
       end
     end
 

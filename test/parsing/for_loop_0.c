@@ -1,7 +1,7 @@
 int main()
 {
-    double a
-    int b,i
+    double a;
+    int b,i;
     a = 1;
     b = 10;
     for (i = 0; i < b; i = i + 1) {
