@@ -1,4 +1,4 @@
-require 'rake/rdoctask'
+require 'rdoc/task'
 require 'rake/clean'
 
 $PARSE_DIR = "PCParse"

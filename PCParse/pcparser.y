@@ -23,7 +23,7 @@ target:
    3.empty - No declarations of any type */
  program:
     function_defs  { result = val[0] }
-  | type_decls function_defs { result = val[0] + val[1] } /*Remove type_decls from this and below line */
+  | type_decls function_defs { result = val[0] + val[1]  } /*Remove type_decls from this and below line */
   | type_decls { result = val[0] }
   | { result = [] }
 
@@ -39,7 +39,7 @@ function_def:
 /* | typename IDENTIFIER '(' ')' block  { result = :Function[val[0],val[1],,val[4]] } */
   ;
 
-formal_params:
+  formal_params:
     formal_params ',' formal_param  { result = [val[0] ,val[2]] }
   | formal_param  { result = :Formals[val[0]] }
   ;
@@ -50,7 +50,7 @@ formal_params:
   | typename '&' IDENTIFIER  { result = val[0] + val[2] }
   | typename array_formal  { result = val[0] + val[1] }
   | typename pointer_decl  { result = val[0] + val[1] }
-  | { result = []}
+  | {result = val[0] }
   ;
  
    typename:
@@ -62,14 +62,15 @@ formal_params:
  
   /*Rule defining a declaration with a type and a list of one or more variables/functions */
     type_decl:
-    typename decl_list ';'{ result = [val[0], val[1]] }
+    typename decl_list ';'{ result = [val[0],val[1]] }
     ;
  
   /* Rule defining single declaration or a list of declarations */
     decl_list:
     decl_list ',' lval { result = val[0] + ' ' + val[2]  }
 /*   | expr     Putting decl here gives rise to reduce/reduce conflicts */ 
-    | expr
+/*  | expr*/
+     | lval
    ;
 
 
@@ -82,11 +83,11 @@ formal_params:
 /* Rule defining a function declaration */
    fn_decl:
     IDENTIFIER '(' ')'  { result = [val[0],:Formals[[]]] }
-  | IDENTIFIER '(' formal_params ')' { result = val[0] + :Formals[val[2]] }
+  | IDENTIFIER '(' formal_params ')' { result = [val[0],:Formals[val[2]]] }
   ;
 
   array_formal:
-    IDENTIFIER array_formal_subs  { result = :ArrayArg[val[0]] +  val[1] }
+    IDENTIFIER array_formal_subs  { result = val[0] + val[1] }
   ;
 
   array_formal_subs:
@@ -145,13 +146,14 @@ formal_params:
   
  /*Rules for optional else */
    optional_else:
-    ELSE  { result = [] }
+    { result = [] }
+  | ELSE  { result = [] }
   | ELSE '{' stmt_list '}'  { result = :ElseStmt[val[0],val[1]] }
   ;
   
   lval:
     IDENTIFIER 
-  | array_ref 
+  | array_ref  { result = :ArrayRef[val[0]]}
   | pointer_decl {result = val[0] }
   ;
 
@@ -162,7 +164,7 @@ expr:
   | REAL_NUM  { result = :ConstReal[val[0]] }
   | STRING  { result = :ConstString[val[0]] }
   | function_call 
-  | array_ref 
+    /*  | array_ref */
   | expr '+' expr  { result = :BinaryOp[val[0], '+', val[2]]}
   | expr '-' expr  { result = :BinaryOp[val[0], '-', val[2]] }
   | expr '*' expr  { result = :BinaryOp[val[0], '*', val[2]] }
@@ -178,7 +180,7 @@ expr:
 
 
   array_ref:
-   IDENTIFIER '[' array_index_list ']'  { result = :ArrayRef[val[0],val[2]] }
+  IDENTIFIER '[' array_index_list ']'  { result = [val[0] ,val[2]] }
   ;
 
   array_index_list:
@@ -192,9 +194,9 @@ expr:
   ;
 
   actual_params:
-    actual_params ','expr  { result = val[0] + [val[2]] } 
-   | expr { result = [val[0]] }
-  ;
+     actual_params ',' lval  { result = val[0] + [val[2]] } 
+   | lval { result = val[0] }
+   ;
 
 end
 
