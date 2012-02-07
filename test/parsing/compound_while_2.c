@@ -10,6 +10,12 @@ int main()
     if (b > 50) {
       break ;
     }
-    else 
+    else {
+     a = a + 1;
     }
+
+    if (a == 10){
+     print("A is equal to 10\n");
+     }
+}
 }
