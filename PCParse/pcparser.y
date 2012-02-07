@@ -193,11 +193,9 @@ expr:
   ;
 
   actual_params:
-     actual_params ',' IDENTIFIER { result = [val[0],val[2]]} 
-   | actual_params ',' array_ref { result = [val[0],val[2]]} 
-   | array_ref
-   | IDENTIFIER
-   | STRING
+     actual_params ',' expr { result = val[0] + [val[2]] } 
+   | expr { result = [val[0]] } 
+
    ;
 
 end
