@@ -163,7 +163,7 @@ expr:
   | REAL_NUM  { result = :ConstReal[val[0]] }
   | STRING  { result = :ConstString[val[0]] }
   | function_call 
-    /*  | array_ref */
+  | array_ref 
   | expr '+' expr  { result = :BinaryOp[val[0], '+', val[2]]}
   | expr '-' expr  { result = :BinaryOp[val[0], '-', val[2]] }
   | expr '*' expr  { result = :BinaryOp[val[0], '*', val[2]] }
