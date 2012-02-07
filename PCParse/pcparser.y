@@ -68,9 +68,8 @@ function_def:
   /* Rule defining single declaration or a list of declarations */
     decl_list:
     decl_list ',' lval { result = val[0] + ' ' + val[2]  }
-/*   | expr     Putting decl here gives rise to reduce/reduce conflicts */ 
-/*  | expr*/
-     | lval
+ /*| expr     Putting decl here gives rise to reduce/reduce conflicts */ 
+   | lval
    ;
 
 
@@ -153,7 +152,7 @@ function_def:
   
   lval:
     IDENTIFIER 
-  | array_ref  { result = :ArrayRef[val[0]]}
+  | array_ref  
   | pointer_decl {result = val[0] }
   ;
 
@@ -180,7 +179,7 @@ expr:
 
 
   array_ref:
-  IDENTIFIER '[' array_index_list ']'  { result = [val[0] ,val[2]] }
+  IDENTIFIER '[' array_index_list ']'  { result = :ArrayRef[val[0] ,val[2]] }
   ;
 
   array_index_list:
@@ -194,8 +193,11 @@ expr:
   ;
 
   actual_params:
-     actual_params ',' lval  { result = val[0] + [val[2]] } 
-   | lval { result = val[0] }
+     actual_params ',' IDENTIFIER { result = [val[0],val[2]]} 
+   | actual_params ',' array_ref { result = [val[0],val[2]]} 
+   | array_ref
+   | IDENTIFIER
+   | STRING
    ;
 
 end
