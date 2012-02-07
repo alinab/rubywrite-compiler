@@ -136,7 +136,7 @@ function_def:
  /* Rules for compound statements */
   compound_stmt:
     FOR '(' simple_stmt ';' expr ';' simple_stmt ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
-  | WHILE '(' simple_stmt ')' '{' stmt_list '}'  { result = :WhileStmt[val[0],val[2],val[5]] }
+  | WHILE '(' simple_stmt ')' block  { result = [val[0],val[2],val[4]] }
   | IF '(' simple_stmt ')' block  optional_else  { result = [val[0],val[2] ,val[4] ,val[5]] }
   ;
   
