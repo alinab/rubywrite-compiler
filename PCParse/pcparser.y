@@ -50,7 +50,7 @@ function_def:
   | typename '&' IDENTIFIER  { result = val[0] + val[2] }
   | typename array_formal  { result = val[0] + val[1] }
   | typename pointer_decl  { result = val[0] + val[1] }
-  | {result = val[0] }
+  | { result = [] }
   ;
  
    typename:
@@ -102,10 +102,7 @@ function_def:
  block:
    '{' stmt_list '}'  { result = :Block[val[1]] }
   ;
-/*
-  block:
-  '{' type_decls '}'  { result = val[1] }
-  ;*/
+
   block:
     { result = [] }
     ;
@@ -140,14 +137,14 @@ function_def:
   compound_stmt:
     FOR '(' simple_stmt ';' expr ';' simple_stmt ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
   | WHILE '(' simple_stmt ')' '{' stmt_list '}'  { result = :WhileStmt[val[0],val[2],val[5]] }
-  | IF '(' simple_stmt ')' '{' stmt_list '}'  optional_else  { result =:IfStmt[val[0] , val[2] ,val[5] ,val[7]] }
+  | IF '(' simple_stmt ')' block  optional_else  { result = [val[0],val[2] ,val[4] ,val[5]] }
   ;
   
  /*Rules for optional else */
    optional_else:
     { result = [] }
   | ELSE  { result = [] }
-  | ELSE '{' stmt_list '}'  { result = :ElseStmt[val[0],val[1]] }
+  | ELSE '{' stmt_list '}'  { result = :ElseStmt[val[2]] }
   ;
   
   lval:
@@ -195,7 +192,6 @@ expr:
   actual_params:
      actual_params ',' expr { result = val[0] + [val[2]] } 
    | expr { result = [val[0]] } 
-
    ;
 
 end

@@ -47,7 +47,7 @@ class UnparsePidginC
       rule :Block do |block| 
       v({  },'{' ,*block.children ,'}') end
       rule :Assignment do |lhs,rhs|
-        h({:hs => 2}, lhs,'=', rhs)
+        h({:hs => 2}, lhs,'=', rhs,';')
       end
       rule :BinaryOp do |rand1, op, rand2|
         h({:hs => 1}, rand1, op, rand2)
