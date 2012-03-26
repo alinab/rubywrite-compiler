@@ -13,19 +13,21 @@ def parsed_output()
     puts
 end
 
-=begin
-Example from http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html
-=end
-options={}
-opts = OptionParser.new do |opts|
-  opts.banner = "ruby pcc.rb -p inpput_file"
-
-  opts.on("-p","--parse", "Parsed output") do |parse|
-     options[:p] = parsed_output() 
-  end
+def unparse()
+    parser = PCParser.new
+    tt = parser.parse_file
+    a = UnparsePidginC.new
+    result = a.unparse(tt)
+    puts result
 end
 
-opts.parse!(ARGV)
+
+def llvm_codegen()
+    parser = PCParser.new
+    ast_in = parser.parse_file
+    Trans.run ast_in
+end
+
 
 class UnparsePidginC
   def unparse (node)
@@ -103,8 +105,8 @@ class UnparsePidginC
       rule :ConstReal do |num|
         h({}, num)
       end
-      rule :ConstString do |num|
-        h({}, num)
+      rule :ConstString do |str|
+        h({}, str)
       end
       rule :Identifier do |i|
         h({}, i)
@@ -124,18 +126,31 @@ class UnparsePidginC
     return box.to_s
   end
 end
+
+=begin
+Example from http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html
+=end
+options={}
+opts = OptionParser.new do |opts|
+  opts.banner = "ruby pcc.rb -p inpput_file"
+
+  opts.on("-p","--parse", "Parsed output") do |parse|
+     options[:p] = parsed_output() 
+  end
+  opts.on("-u","--unparse", "Unparsed original input") do |unparse|
+    options[:u] = unparse()
+  end
+    opts.on("-f","--unparse", "Unparsed original input") do |llvm_codegen|
+    options[:f] = llvm_codegen()
+  end
+end
+
+opts.parse!(ARGV)
+
+#llvm_codegen()
   
 
 
-def unparse
-    parser = PCParser.new
-    tt = parser.parse_file
-    a = UnparsePidginC.new
-    result = a.unparse(tt)
-    puts result
-end
-
-unparse()
    
 
        
