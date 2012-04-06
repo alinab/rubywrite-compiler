@@ -40,16 +40,16 @@ function_def:
   ;
 
   formal_params:
-    formal_params ',' formal_param  { result = [val[0] ,val[2]] }
-  | formal_param  { result = :Formals[val[0]] }
+    formal_params ',' formal_param  { result =val[0], val[2] }
+  | formal_param  { result = val[0] }
   ;
 
   formal_param:
     typename  { result = val[0] }
-  | typename IDENTIFIER  { result = val[0] + val[1] }
-  | typename '&' IDENTIFIER  { result = val[0] + val[2] }
-  | typename array_formal  { result = val[0] + val[1] }
-  | typename pointer_decl  { result = val[0] + val[1] }
+  | typename IDENTIFIER  { result = val[0] , val[1] }
+  | typename '&' IDENTIFIER  { result = val[0] , val[2] }
+  | typename array_formal  { result = val[0] , val[1] }
+  | typename pointer_decl  { result = val[0] , val[1] }
   | { result = [] }
   ;
  
