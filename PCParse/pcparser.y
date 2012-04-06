@@ -99,7 +99,7 @@ function_def:
   | '[' ']'  { result = :EmptySubscript[] }
   ;
 
- block:
+  block:
    '{' stmt_list '}'  { result = :Block[val[1]] }
   ;
 
@@ -148,14 +148,14 @@ function_def:
   ;
   
   lval:
-    IDENTIFIER 
+    IDENTIFIER { result = :Variable[val[0]]}
   | array_ref  
   | pointer_decl {result = val[0] }
   ;
 
 
 expr:
-    IDENTIFIER { result = val[0] }
+    IDENTIFIER { result = :Variable[val[0]] }
   | INT_NUM  { result = :ConstInt[val[0]] }
   | REAL_NUM  { result = :ConstReal[val[0]] }
   | STRING  { result = :ConstString[val[0]] }
