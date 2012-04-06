@@ -1,0 +1,4 @@
+1.Add support for function declarations outside all functions
+2.Clean up the for statment
+3.Work on the unparser1.Add support for function declarations outside all
+functions

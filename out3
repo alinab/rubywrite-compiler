@@ -1,0 +1,544 @@
+:Program[
+  [:Function[
+     "int"
+    ,"codegen_test"
+    ,[:Formals[
+        "inta"
+      ]
+     ,"intb"
+     ]
+    ,:Block[
+       [["int"
+        ,"i t"
+        ]
+       ,:Assignment[
+          "i"
+         ,:BinaryOp[
+            "a"
+           ,"+"
+           ,"b"
+          ]
+        ]
+       ,:FunctionCall[
+          "printf"
+         ,[:ConstString[
+             "\"i\\n\""
+           ]
+          ,"i"
+          ]
+        ]
+       ,["while"
+        ,:BinaryOp[
+           "t"
+          ,"=="
+          ,:ConstInt[
+             "3"
+           ]
+         ]
+        ,:Block[
+           [:Assignment[
+              "a"
+             ,:ConstInt[
+                "1"
+              ]
+            ]
+           ,["while"
+            ,:BinaryOp[
+               "t"
+              ,"!="
+              ,:ConstInt[
+                 "4"
+               ]
+             ]
+            ,:Block[
+               [:Assignment[
+                  "b"
+                 ,:ConstInt[
+                    "2"
+                  ]
+                ]
+               ]
+             ]
+            ]
+           ]
+         ]
+        ]
+       ]
+     ]
+   ]
+  ]
+]
+[:Function[
+   "int"
+  ,"codegen_test"
+  ,[:Formals[
+      "inta"
+    ]
+   ,"intb"
+   ]
+  ,:Block[
+     [["int"
+      ,"i t"
+      ]
+     ,:Assignment[
+        "i"
+       ,:BinaryOp[
+          "a"
+         ,"+"
+         ,"b"
+        ]
+      ]
+     ,:FunctionCall[
+        "printf"
+       ,[:ConstString[
+           "\"i\\n\""
+         ]
+        ,"i"
+        ]
+      ]
+     ,["while"
+      ,:BinaryOp[
+         "t"
+        ,"=="
+        ,:ConstInt[
+           "3"
+         ]
+       ]
+      ,:Block[
+         [:Assignment[
+            "a"
+           ,:ConstInt[
+              "1"
+            ]
+          ]
+         ,["while"
+          ,:BinaryOp[
+             "t"
+            ,"!="
+            ,:ConstInt[
+               "4"
+             ]
+           ]
+          ,:Block[
+             [:Assignment[
+                "b"
+               ,:ConstInt[
+                  "2"
+                ]
+              ]
+             ]
+           ]
+          ]
+         ]
+       ]
+      ]
+     ]
+   ]
+ ]
+]
+:Function[
+  "int"
+ ,"codegen_test"
+ ,[:Formals[
+     "inta"
+   ]
+  ,"intb"
+  ]
+ ,:Block[
+    [["int"
+     ,"i t"
+     ]
+    ,:Assignment[
+       "i"
+      ,:BinaryOp[
+         "a"
+        ,"+"
+        ,"b"
+       ]
+     ]
+    ,:FunctionCall[
+       "printf"
+      ,[:ConstString[
+          "\"i\\n\""
+        ]
+       ,"i"
+       ]
+     ]
+    ,["while"
+     ,:BinaryOp[
+        "t"
+       ,"=="
+       ,:ConstInt[
+          "3"
+        ]
+      ]
+     ,:Block[
+        [:Assignment[
+           "a"
+          ,:ConstInt[
+             "1"
+           ]
+         ]
+        ,["while"
+         ,:BinaryOp[
+            "t"
+           ,"!="
+           ,:ConstInt[
+              "4"
+            ]
+          ]
+         ,:Block[
+            [:Assignment[
+               "b"
+              ,:ConstInt[
+                 "2"
+               ]
+             ]
+            ]
+          ]
+         ]
+        ]
+      ]
+     ]
+    ]
+  ]
+]
+"int"
+"codegen_test"
+[:Formals[
+   "inta"
+ ]
+,"intb"
+]
+:Formals[
+  "inta"
+]
+"inta"
+"intb"
+:Block[
+  [["int"
+   ,"i t"
+   ]
+  ,:Assignment[
+     "i"
+    ,:BinaryOp[
+       "a"
+      ,"+"
+      ,"b"
+     ]
+   ]
+  ,:FunctionCall[
+     "printf"
+    ,[:ConstString[
+        "\"i\\n\""
+      ]
+     ,"i"
+     ]
+   ]
+  ,["while"
+   ,:BinaryOp[
+      "t"
+     ,"=="
+     ,:ConstInt[
+        "3"
+      ]
+    ]
+   ,:Block[
+      [:Assignment[
+         "a"
+        ,:ConstInt[
+           "1"
+         ]
+       ]
+      ,["while"
+       ,:BinaryOp[
+          "t"
+         ,"!="
+         ,:ConstInt[
+            "4"
+          ]
+        ]
+       ,:Block[
+          [:Assignment[
+             "b"
+            ,:ConstInt[
+               "2"
+             ]
+           ]
+          ]
+        ]
+       ]
+      ]
+    ]
+   ]
+  ]
+]
+[["int"
+ ,"i t"
+ ]
+,:Assignment[
+   "i"
+  ,:BinaryOp[
+     "a"
+    ,"+"
+    ,"b"
+   ]
+ ]
+,:FunctionCall[
+   "printf"
+  ,[:ConstString[
+      "\"i\\n\""
+    ]
+   ,"i"
+   ]
+ ]
+,["while"
+ ,:BinaryOp[
+    "t"
+   ,"=="
+   ,:ConstInt[
+      "3"
+    ]
+  ]
+ ,:Block[
+    [:Assignment[
+       "a"
+      ,:ConstInt[
+         "1"
+       ]
+     ]
+    ,["while"
+     ,:BinaryOp[
+        "t"
+       ,"!="
+       ,:ConstInt[
+          "4"
+        ]
+      ]
+     ,:Block[
+        [:Assignment[
+           "b"
+          ,:ConstInt[
+             "2"
+           ]
+         ]
+        ]
+      ]
+     ]
+    ]
+  ]
+ ]
+]
+["int"
+,"i t"
+]
+"int"
+"i t"
+:Assignment[
+  "i"
+ ,:BinaryOp[
+    "a"
+   ,"+"
+   ,"b"
+  ]
+]
+"i"
+:BinaryOp[
+  "a"
+ ,"+"
+ ,"b"
+]
+"a"
+"+"
+"b"
+:FunctionCall[
+  "printf"
+ ,[:ConstString[
+     "\"i\\n\""
+   ]
+  ,"i"
+  ]
+]
+"printf"
+[:ConstString[
+   "\"i\\n\""
+ ]
+,"i"
+]
+:ConstString[
+  "\"i\\n\""
+]
+"\"i\\n\""
+"i"
+["while"
+,:BinaryOp[
+   "t"
+  ,"=="
+  ,:ConstInt[
+     "3"
+   ]
+ ]
+,:Block[
+   [:Assignment[
+      "a"
+     ,:ConstInt[
+        "1"
+      ]
+    ]
+   ,["while"
+    ,:BinaryOp[
+       "t"
+      ,"!="
+      ,:ConstInt[
+         "4"
+       ]
+     ]
+    ,:Block[
+       [:Assignment[
+          "b"
+         ,:ConstInt[
+            "2"
+          ]
+        ]
+       ]
+     ]
+    ]
+   ]
+ ]
+]
+"while"
+:BinaryOp[
+  "t"
+ ,"=="
+ ,:ConstInt[
+    "3"
+  ]
+]
+"t"
+"=="
+:ConstInt[
+  "3"
+]
+"3"
+:Block[
+  [:Assignment[
+     "a"
+    ,:ConstInt[
+       "1"
+     ]
+   ]
+  ,["while"
+   ,:BinaryOp[
+      "t"
+     ,"!="
+     ,:ConstInt[
+        "4"
+      ]
+    ]
+   ,:Block[
+      [:Assignment[
+         "b"
+        ,:ConstInt[
+           "2"
+         ]
+       ]
+      ]
+    ]
+   ]
+  ]
+]
+[:Assignment[
+   "a"
+  ,:ConstInt[
+     "1"
+   ]
+ ]
+,["while"
+ ,:BinaryOp[
+    "t"
+   ,"!="
+   ,:ConstInt[
+      "4"
+    ]
+  ]
+ ,:Block[
+    [:Assignment[
+       "b"
+      ,:ConstInt[
+         "2"
+       ]
+     ]
+    ]
+  ]
+ ]
+]
+:Assignment[
+  "a"
+ ,:ConstInt[
+    "1"
+  ]
+]
+"a"
+:ConstInt[
+  "1"
+]
+"1"
+["while"
+,:BinaryOp[
+   "t"
+  ,"!="
+  ,:ConstInt[
+     "4"
+   ]
+ ]
+,:Block[
+   [:Assignment[
+      "b"
+     ,:ConstInt[
+        "2"
+      ]
+    ]
+   ]
+ ]
+]
+"while"
+:BinaryOp[
+  "t"
+ ,"!="
+ ,:ConstInt[
+    "4"
+  ]
+]
+"t"
+"!="
+:ConstInt[
+  "4"
+]
+"4"
+:Block[
+  [:Assignment[
+     "b"
+    ,:ConstInt[
+       "2"
+     ]
+   ]
+  ]
+]
+[:Assignment[
+   "b"
+  ,:ConstInt[
+     "2"
+   ]
+ ]
+]
+:Assignment[
+  "b"
+ ,:ConstInt[
+    "2"
+  ]
+]
+"b"
+:ConstInt[
+  "2"
+]
+"2"
