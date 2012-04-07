@@ -28,7 +28,7 @@ end
 
 
 LLVM.init_x86
-$symbol_table = Hash.new{|k,v| k[v] = 0}
+$symbol_table = Hash.new 
 $testMod = LLVM::Module.new("myMod")
 $builder = LLVM::Builder.new()
 $engine = LLVM::JITCompiler.new($testMod)
@@ -47,7 +47,6 @@ def llvm_codegen()
 end
 
 def walkNode(astNode)
-
 #    if  astNode.instance_of? RubyWrite::Node
      nodeVal = astNode.value
      children = astNode.children
@@ -58,18 +57,15 @@ def walkNode(astNode)
         programN(astNode)       
       when  :Function
           create_function(astNode)
+        
       when :ConstInt
-            #print nodeVal
-            return 1,astNode
-      when :Assignment
-            return 2,astNode 
-      when :If
-        codegen_expr_if_cond(astNode)
+        codegen_num(astNode)      #  return 1,astNode
+      when :BinaryOp
+         #print nodeVal
+          codegen_binary_expr(astNode)   #    return 2,astNode 
       when :Variable
-        codegen_var(astNode)
-       when :ConsInt
-        codegen_expr_num(astNode)
-    end       
+        codegen_expr_var(astNode)
+      end       
 #   end
 end
 
@@ -88,47 +84,39 @@ def create_function(funcNode)
   name = funcNode.child(1)
   formals = funcNode.child(2)
   block = funcNode.child(3)
-  
+
+  $symbol_table.clear  
   #print block
   #Have to get the types out of the formals array
   #formals.prettyprint STDOUT
   j = 0 
   arg_types = Array.new
-  func_args = Array.new
   #print formals
   formals.each  do |i|
-     t = i[0]
-     #print t
-     if type_hash.assoc(t)
-        arg_types.insert(j,t)
-       j = j+1
-    else 
-       func_args.insert(j,t)
-       j = j + 1
-    end
+    t = i[0]
+    e  = i[1]
+    arg_types.insert(j,t)
+    $symbol_table[j] = e
+    j = j + 1
+    
   end
   # print arg_types
- # print func_args
- 
+  #print $symbol_table.keys
+
   #we need to create a function type so that we can add it to the module
-  point_func,f_name = codegen_func_proto(name,arg_types,ret_type) #This should return a function type
-  $symbol_table.clear
- 
+  point_func,func = codegen_func_proto(name,arg_types,ret_type) #This should return a function type
+
+  entry = func.basic_blocks.append("entry")
+  $builder.position_at_end(entry);
+  block_code =  codegen_block(block)
+
+  pos = $builder.insert_block.parent
   
-  #print f_name
-  bb = LLVM::BasicBlock.new()
-  #print point_func.element_type
-  #entry = point_func.basic_blocks.append("entry")
-  # $builder.position_at_end(bb);
-
-    
-  block_code =  codegen_block(block,bb)
-
-  
-  #builder.ret(res)
-  #pass_mgr.run(fn)
-  #return  fn;
-
+  $builder.ret(func)
+  $testMod.dump
+  value = $engine.run_function($testMod.functions["fnew"], 2,3)
+  print value
+  return 0 
 
 end
 
@@ -142,8 +130,8 @@ def  codegen_func_proto(name,arg_types,ret_type)
       e=e+1
      end
   end
-   #print new_arg_types
- 
+  #print new_arg_types
+
   if ret_type == 'int' 
     new_ret_type = LLVM::Int
   else
@@ -154,70 +142,110 @@ def  codegen_func_proto(name,arg_types,ret_type)
   
   fpoint = LLVM::Pointer(fnew)
   #print fpoint
-  $testMod.functions.add("fnew",new_arg_types,new_ret_type) 
-  #fnew = fnew.add #.append("entry")
+  fn =  $testMod.functions.add("fnew",new_arg_types,new_ret_type) 
+  #fn = $testMod.functions.add("fnew",LLVM::Type.function(new_arg_types,new_ret_type)) 
   #print entry
-  return fpoint,fnew
+  return fpoint,fn
 end 
 
 
-def codegen_block(funcBody,build)
+def codegen_block(funcBody)
   funcBody.child(0).each do |i|
    #print i
+   len = $symbol_table.length
+   if i.instance_of? Array
+     #print i[1]
+     len = len+1
+     $symbol_table[len] = i[1]
+      next
+   end
+
+   #walkNode returns here
    ret,nodeval = walkNode(i)
-    case ret 
-    when 1
-     codegen_num(nodeval)
-    when 2
-     codegen_assign(nodeval)
-    end
+    #case ret 
+    #when 1
+    # codegen_num(nodeval)
+    #when 2 
+    #  codegen_binary_expr(nodeval)
+    # end
   end
 end
 
 
-def  codegen_num(node,b)
+def  codegen_num(node)
   v = node.value
   l = node.child(0)
   n = l.to_i
-  c = LLVM::Int(n)
-  #print c
+  c = LLVM::Double(n)
   $builder.alloca(c)
-  return 
+  return n.to_i
 end
 
 
+def another_walk_node(node)
+     nval = node.value
+     children = node.children
+     #print "nval",nval
+      case nval
+      when :ConstInt
+        codegen_num(node)      #  return 1,astNode
+      when :Variable
+        codegen_expr_var(node)
+      end 
+end
 
-def codegen_expr_bin(binexpr)
-  lhs = binexpr.child(0)
-  op = binexpr.child(1)
-  # i = binexpr.child(2)
-  rhs = binexpr.child(0)
-  
-  if op == '='
-    name = lhs     
-    if !(symbol_table.has_key(name))
-      return "unknown var %s", name
-    end
-    builder.store(var,rhs)
-    return lhs
-  end
+def codegen_binary_expr(binode)
+  lhs = binode.child(0)
+  op = binode.child(1)
+  rhs = binode.child(2)
 
+  lhs_ret = codegen_child_expr(lhs)
+  #print lhs_ret 
+  rhs_ret = codegen_child_expr(rhs)
   
   case op
   when  '+'
-    return builder.fadd(lhs, rhs, "")
+        $builder.fadd(lhs_ret,rhs_ret,"addtmp")
   when '-' 
-    return builder.fsub(lhs, rhs, "")
+        $builder.fsub(lhs_ret, rhs_ret,"subtmp")
   when  '*'
-    return builder.fmul(lhs, rhs, "")
+         $builder.fmul(lhs_ret, rhs_ret,"multmp")
+  when  '/'
+         $builder.fdiv(lhs_ret ,rhs_ret,"divtmp")
   when  '<'
-        tmp = builder.fcmp(:ord, lhs, rhs, "")
-    return builder.(uitofp, tmp, LLVM::Double(tmp), "")
-  end
-
+    tmp = $builder.fcmp(:ule, lhs, rhs)
+    $builder.(uitofp, tmp, LLVM::Double)
+  end  
 end   
 
+def codegen_child_expr(node)
+ #print node.value,"_____\n"
+  case node.value
+  when  :BinaryOp
+    codegen_binary_expr(nnode)
+ else
+    a = another_walk_node(node)
+    #print a,"__"
+    l_ret = LLVM::Double(a)
+ end
+  return l_ret
+end
+    
 
+
+#More work to be done
+def codegen_expr_var (varnode)
+  v= varnode.child(0)
+  #v.prettyprint STDOUT
+  if $symbol_table.has_value?(v)
+      return v
+  else
+     raise "Uninitialized variable"
+  end 
+end
+
+
+puts $testMod.dump
 
 #Have to get hold of the If node
 def  codegen_expr_if_cond(node)
@@ -292,6 +320,10 @@ def create_argument_allocas (fname,function)
       
 end
 
+=begin
+
+=end
+
 =begin 
 def codegen_prototype (funcnode)
   fn = LLVM::Value.new()
@@ -356,8 +388,8 @@ def codegen_func(node)
 =end
 
 
-def codegen_expr_var (varnode)
-  
+
+=begin  
   old_scope = Hash.new
   function = LLVM::Value.new()
   alloca = LLVM::Value.new()
@@ -379,7 +411,7 @@ def codegen_expr_var (varnode)
  
   return init
 
-end
+=end
 
 #-----------------------------------------------------------------------#
 class UnparsePidginC
