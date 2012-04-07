@@ -57,14 +57,16 @@ def walkNode(astNode)
         programN(astNode)       
       when  :Function
           create_function(astNode)
-        
       when :ConstInt
         codegen_num(astNode)      #  return 1,astNode
       when :BinaryOp
          #print nodeVal
-          codegen_binary_expr(astNode)   #    return 2,astNode 
+          val = codegen_binary_expr(astNode)
+          return val
       when :Variable
         codegen_expr_var(astNode)
+      when :If
+        codegen_if_else(astNode)
       end       
 #   end
 end
@@ -86,9 +88,6 @@ def create_function(funcNode)
   block = funcNode.child(3)
 
   $symbol_table.clear  
-  #print block
-  #Have to get the types out of the formals array
-  #formals.prettyprint STDOUT
   j = 0 
   arg_types = Array.new
   #print formals
@@ -101,21 +100,24 @@ def create_function(funcNode)
     
   end
   # print arg_types
-  #print $symbol_table.keys
-
+  #print $symbol_table.values
+ 
+  args =  $symbol_table.values
   #we need to create a function type so that we can add it to the module
+
   point_func,func = codegen_func_proto(name,arg_types,ret_type) #This should return a function type
 
   entry = func.basic_blocks.append("entry")
   $builder.position_at_end(entry);
-  block_code =  codegen_block(block)
+  block_code =  codegen_block(block,entry)
 
+  #print "==>", block_code
+  #return 
   pos = $builder.insert_block.parent
-  
   $builder.ret(func)
-  $testMod.dump
-  value = $engine.run_function($testMod.functions["fnew"], 2,3)
-  print value
+  print $testMod.dump
+  value = $engine.run_function($testMod.functions["fnew"],2 ,10)
+  #print value.to_f
   return 0 
 
 end
@@ -143,55 +145,55 @@ def  codegen_func_proto(name,arg_types,ret_type)
   fpoint = LLVM::Pointer(fnew)
   #print fpoint
   fn =  $testMod.functions.add("fnew",new_arg_types,new_ret_type) 
-  #fn = $testMod.functions.add("fnew",LLVM::Type.function(new_arg_types,new_ret_type)) 
-  #print entry
   return fpoint,fn
 end 
 
 
-def codegen_block(funcBody)
+def codegen_block(funcBody,block_name)
   funcBody.child(0).each do |i|
    #print i
    len = $symbol_table.length
-   if i.instance_of? Array
-     #print i[1]
+   if i.instance_of? Array #declaration
+     c = i[1]
      len = len+1
      $symbol_table[len] = i[1]
-      next
+     d = i[0]
+     val = $LLVM_types_hash[d]
+     #print val
+     $builder.alloca(val)
+     next
    end
 
    #walkNode returns here
-   ret,nodeval = walkNode(i)
-    #case ret 
-    #when 1
-    # codegen_num(nodeval)
-    #when 2 
-    #  codegen_binary_expr(nodeval)
-    # end
+   nodeval = walkNode(i)
+   #print nodeval
+   # $builder.position(block_name,nodeval)
+
   end
 end
 
 
 def  codegen_num(node)
+  
   v = node.value
   l = node.child(0)
   n = l.to_i
-  c = LLVM::Double(n)
+  c = LLVM::Int(n)
   $builder.alloca(c)
-  return n.to_i
+  return c
 end
 
 
 def another_walk_node(node)
-     nval = node.value
-     children = node.children
-     #print "nval",nval
-      case nval
-      when :ConstInt
-        codegen_num(node)      #  return 1,astNode
-      when :Variable
-        codegen_expr_var(node)
-      end 
+  nval = node.value
+  child = node.children
+  case nval
+  when :ConstInt
+   a =  codegen_num(node)   
+   return a
+  when :Variable
+    a =  codegen_expr_var(node)
+  end 
 end
 
 def codegen_binary_expr(binode)
@@ -199,36 +201,44 @@ def codegen_binary_expr(binode)
   op = binode.child(1)
   rhs = binode.child(2)
 
+  #print "lval,",lhs
+  #print "rval,",rhs
+
+  #print op
   lhs_ret = codegen_child_expr(lhs)
   #print lhs_ret 
   rhs_ret = codegen_child_expr(rhs)
-  
+
+  #print "lval,",lhs_ret
+  #print "rval,",rhs_ret
+ 
+  #p = $builder.insert_block.parent
+  #print op  
   case op
-  when  '+'
-        $builder.fadd(lhs_ret,rhs_ret,"addtmp")
-  when '-' 
-        $builder.fsub(lhs_ret, rhs_ret,"subtmp")
+  when '+'
+     return  $builder.add(lhs_ret,rhs_ret,"addtmp")
+  when '-'     
+      return $builder.sub(lhs_ret, rhs_ret,"subtmp")
   when  '*'
-         $builder.fmul(lhs_ret, rhs_ret,"multmp")
+       return $builder.mul(lhs_ret, rhs_ret,"multmp")
   when  '/'
-         $builder.fdiv(lhs_ret ,rhs_ret,"divtmp")
+       return $builder.div(lhs_ret ,rhs_ret,"divtmp")
   when  '<'
     tmp = $builder.fcmp(:ule, lhs, rhs)
-    $builder.(uitofp, tmp, LLVM::Double)
-  end  
+     return  $builder.(uitofp, tmp, LLVM::Double)
+  end
 end   
 
 def codegen_child_expr(node)
- #print node.value,"_____\n"
-  case node.value
+  e = node.value
+  case e
   when  :BinaryOp
     codegen_binary_expr(nnode)
- else
+  else
     a = another_walk_node(node)
-    #print a,"__"
-    l_ret = LLVM::Double(a)
+    vret = a
+    return vret
  end
-  return l_ret
 end
     
 
@@ -244,11 +254,9 @@ def codegen_expr_var (varnode)
   end 
 end
 
-
-puts $testMod.dump
-
+=begin
 #Have to get hold of the If node
-def  codegen_expr_if_cond(node)
+def  codegen_expr_if_else(node)
     cond =  LLVM::Value.new()
     function =   LLVM::Value.new()
     if_br  =  LLVM::Value.new()
@@ -281,7 +289,7 @@ def  codegen_expr_if_cond(node)
     incoming = Hash.new["if_branch_bb",1 ,"else_branch_bb",2]
     phi = builder.phi(LLVM::Double, incoming ,"")
     return phi;
-end
+=end
 
 
 def  create_alloca_ar (function, var)
@@ -295,6 +303,7 @@ def  create_alloca_ar (function, var)
   bt.dispose
   return r;
 end
+
 
 def create_argument_allocas (fname,function)
     
