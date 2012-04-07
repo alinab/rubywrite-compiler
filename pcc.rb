@@ -49,8 +49,8 @@ end
 def walkNode(astNode)
 
 #    if  astNode.instance_of? RubyWrite::Node
-    nodeVal = astNode.value
-    children = astNode.children
+     nodeVal = astNode.value
+     children = astNode.children
 
     #puts astNode
       case nodeVal
@@ -58,10 +58,11 @@ def walkNode(astNode)
         programN(astNode)       
       when  :Function
           create_function(astNode)
-      #when :Assignment
-
-      when :Binop
-        codegen_expr_bin(astNode)
+      when :ConstInt
+            #print nodeVal
+            return 1,astNode
+      when :Assignment
+            return 2,astNode 
       when :If
         codegen_expr_if_cond(astNode)
       when :Variable
@@ -113,13 +114,15 @@ def create_function(funcNode)
   point_func,f_name = codegen_func_proto(name,arg_types,ret_type) #This should return a function type
   $symbol_table.clear
  
+  
   #print f_name
-  #bb = LLVM::BasicBlock.new()
-  #entry = f_name.basic_blocks.append("entry")
-  # $builder.position_at_end(entry);
-  
-  block_code =  codegen_block(block)
-  
+  bb = LLVM::BasicBlock.new()
+  #print point_func.element_type
+  #entry = point_func.basic_blocks.append("entry")
+  # $builder.position_at_end(bb);
+
+    
+  block_code =  codegen_block(block,bb)
 
   
   #builder.ret(res)
@@ -148,28 +151,38 @@ def  codegen_func_proto(name,arg_types,ret_type)
   end
   fnew = LLVM::Function(new_arg_types,new_ret_type)
   #print fnew
-
+  
   fpoint = LLVM::Pointer(fnew)
   #print fpoint
   $testMod.functions.add("fnew",new_arg_types,new_ret_type) 
-
+  #fnew = fnew.add #.append("entry")
+  #print entry
   return fpoint,fnew
 end 
 
 
-def codegen_block(funcBody)
+def codegen_block(funcBody,build)
   funcBody.child(0).each do |i|
-   print i
-   #walkNode(funcBody)
+   #print i
+   ret,nodeval = walkNode(i)
+    case ret 
+    when 1
+     codegen_num(nodeval)
+    when 2
+     codegen_assign(nodeval)
+    end
   end
 end
 
 
-
-
-def  codegen_expr_num (node)
+def  codegen_num(node,b)
   v = node.value
-  return LLVM::ConstantReal.node.parse(LLVM::Double(v),v)
+  l = node.child(0)
+  n = l.to_i
+  c = LLVM::Int(n)
+  #print c
+  $builder.alloca(c)
+  return 
 end
 
 
