@@ -366,19 +366,6 @@ end
     phi = builder.phi(LLVM::Double, incoming ,"")
     return phi;
 
-=end
-def  create_alloca_ar (function, var)
-
-  bb = LLVM::BasicBlock.new(function)
-  r  = LLVM::Value.new()
-
-
-  bt.position(bb, bb.instructions[0]);
-  r = bt.alloca(LLVM::Double.new.type,var)
-  bt.dispose
-  return r;
-end
-
 
 def create_args_allocas(vtype,name)
   valtype = $LLVM_types_hash[vtype]
@@ -387,93 +374,7 @@ end
 
 
 
-=begin
-    alloca = create_alloca(fname, arg)
-    param = LLVMGetParam (fname)
-    builder.store(param, alloca)
-
-    if (symbol_table.has_key(arg_name))
-      return "duplicate symbol '%s' found", arg
-    end
-  i=i+1
-  end
-            
-  return NULL;
-      
-=end
-
-=begin
-
-=end
-
-=begin 
-def codegen_prototype (funcnode)
-  fn = LLVM::Value.new()
-  args_store = LLVM::Value.new()
-  args_tys =  LLVM::Value.new()  
-
-  name = funcnode.value
-  n = funcnode.children - 1
-  i= 0
-  while(i < n)
-    argument_str  = funcnode.children(i).value
-    i = i+1
-  end
-  #j = 1
-  #while(j < n)
-  #  names  = funcnode.children(i)
-  #  j = j+1
-  #end
-
-
-  if fn.GetNamedFunction(name)
-            if fn.basic_blocks
-              return "redefinition of function"
-            end
-            if n != fn.params
-              return  "number of arguments different"
-            end
-          
-  else 
-    arg_tys = length(argument_types)
-    for i in n
-      arg_tys[i] = LLVM::Double()
-    end
-    fn.add(name,arg_types)
-    
-    args = fn.params
-           for i in n
-             args_store[i].name=args_str[i]
-           end
-  end
-
-  return fn;
-=end
-
-=begin  
-  old_scope = Hash.new
-  function = LLVM::Value.new()
-  alloca = LLVM::Value.new()
-  init = LLVM::Value.new()
-
-  
-  function = (builder.insert_block).parent
-       
-  init = varnode.value
-          
-  alloca = create_alloca_ar(function,init);
-  builder.store(init, alloca)
-          
-  if a = symbol_table[init]
-    old_scope[init] = a
-  end
-    symbol_table.store(init,alloca)
-
- 
-  return init
-
-=end
-
+#-----------------------------------------------------------------------#
 #-----------------------------------------------------------------------#
 class UnparsePidginC
   def unparse (node)
