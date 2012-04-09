@@ -35,8 +35,8 @@ $engine = LLVM::JITCompiler.new($testMod)
 $pass_mgr = LLVM::FunctionPassManager.new($engine,$testMod)
 #hash to check type
 $LLVM_types_hash = {'int' => LLVM::Int,  'double' => LLVM::Double }
-$vars = Hash.new
-
+$vars = Hash.new #Var=>values hash table
+$func_no #number of functions
 
 #---Starting with the code genertion for LLVm using AST nodes#
 def llvm_codegen()
@@ -55,9 +55,7 @@ def walkNode(astNode)
       when  :Program
         programN(astNode)       
       when  :Function
-          create_function(astNode)
-      #when :ConstInt
-       #  codegen_num(astNode)      #  return 1,astNode
+          return create_function(astNode)
       when :BinaryOp
           val = codegen_binary_expr(astNode)
            return val
@@ -75,13 +73,17 @@ end
     
 
 def programN(node)
+  $func_no = 0
   node.child(0).each  do |i| 
+   $func_no = $func_no + 1
     walkNode(i)
   end
   $testMod.verify
-  print $testMod.dump
-  value = $engine.run_function($testMod.functions["test"],2 ,10)
-
+  $testMod.dump
+  value = $engine.run_function($testMod.functions["test"],2.to_i ,10.to_i)
+  $testMod.dispose
+  $builder.dispose
+  print "done\n"
 end
 
 def create_function(funcNode)
@@ -92,6 +94,8 @@ def create_function(funcNode)
   formals = funcNode.child(2)
   block = funcNode.child(3)
 
+  #Error checking for duplicate named functions remaining
+  $vars.clear
   $symbol_table.clear  
   j = 0 
   arg_types = Array.new
@@ -112,13 +116,10 @@ def create_function(funcNode)
     create_args_allocas(v,e)   
   end
  
-  
   #we need to create a function type so that we can add it to the module
   point_func,func = codegen_func_proto(name,arg_types,ret_type) #This should return a function type
   entry = func.basic_blocks.append("entry")
-  #print func.params,"\n"
-  $builder.position_at_end(entry);
-  #print value.to_f
+  $builder.position_at_end(entry);   
   block_code =  codegen_block(block)
   $builder.ret(func)
   return func
@@ -167,13 +168,7 @@ def codegen_block(funcBody)
      $builder.alloca(val,c)
      next
    end
-    #print $symbol_table,"\n"
-
-    nodeval = walkNode(i)
-    #nodeval.dump
-    #print nodeval,"\n"
-    #print nodeval,"->nval\n"
-    #return nodeval
+     nodeval = walkNode(i)
   end
 end
 
@@ -215,12 +210,15 @@ def codegen_binary_expr(binode)
   op = binode.child(1)
   rhs = binode.child(2)
 
-  #if op ==  "=="
-  # var_res = codegen_expr_var(lhs)
-  #  rval = codegen_num(rhs)
-  #  print rval 
-  #  return 
-  #end
+  if op ==  "=="
+    var_lhs = codegen_expr_var(lhs)
+    r_val  = another_walk_node(rhs)
+    if var_lhs == r_val 
+         return LLVM::Int(0)
+    else 
+         return LLVM::Int(1)
+    end
+  end
 
   lhs_ret = codegen_child_expr(lhs)
 
@@ -268,13 +266,11 @@ def codegen_assign(node)
   if flag == 1
     if vval.value == :ConstInt
       var_val= codegen_num(vval,var_name)   
-      #print "Table->",vars
-      #return 
     elsif vval.value == :BinaryOp
       var_val = codegen_binary_expr(vval)
       alloc = $builder.alloca(var_val)
       $builder.load(alloc,var_name)
-    elsif :Variable
+    elsif   :Variable
       var_val = codegen_expr_var(vval)
       alloc = $builder.alloca(var_val)
       $builder.load(alloc,var_name)
@@ -300,7 +296,6 @@ end
 #More work to be done
 def codegen_expr_var(varnode)
   r = varnode.child(0)
-  #print r,"---->vname\n"
   if $vars.assoc(r)
     var_val =  $vars[r]
     #print val,"val\n" 
@@ -310,6 +305,15 @@ def codegen_expr_var(varnode)
   end 
 end
 
+def codegen_stmt_block(blocknode)
+    a = blocknode.child(0)
+    b = a.at(0)
+    #print b,"---->"
+    nodeval = codegen_assign(b)
+    return nodeval 
+end
+
+
 
 
 def  codegen_if_else(node)
@@ -317,56 +321,40 @@ def  codegen_if_else(node)
   if_true_block = node.child(1)
   else_stmt_block = node.child(2)
   cond_expr_val = codegen_binary_expr(cond)
-  
-  zero_val = LLVM::Int(0)
 
-  cond_val = $builder.icmp(:ne,zero_val,cond_expr_val,"if_cond")
- 
+  zero_val = LLVM::Int(0)
+  cond_val = $builder.icmp(:eq,zero_val,cond_expr_val,"testcond")
+
   start_bb = $builder.insert_block
   paren_func = start_bb.parent
+  #print start_bb
+
+
   then_bb = paren_func.basic_blocks.append("ifthen_branch")
-  $builder.position_at_end(then_bb)
-
-  then_val = codegen_block(if_true_block)
-
+  $builder.position_at_end(then_bb)  
+  then_val = codegen_stmt_block(if_true_block)
   new_then_bb = $builder.insert_block
 
   else_bb = paren_func.basic_blocks.append("else_branch")
-  $builder.position_at_end(else_bb)
-  else_val = codegen_block(else_stmt_block)
-
+  $builder.position_at_end(else_bb)  
+  else_val = codegen_stmt_block(else_stmt_block)
   new_else_bb = $builder.insert_block
-  merge_bb = paren_func.basic_blocks.append("if_else_branch")
-  $builder.position_at_end(merge_bb)
-
-
-  incoming = Hash.new["then_val" => "then_bb" ,"else_val" => "new_else_bb"]
-  
-  phi = $builder.phi(LLVM::Int,incoming)
-  
-  $builder.position_at_end(start_bb)
  
-  $builder.position_at_end(then_bb)
-  $builder.position_at_end(new_else_bb)
-  $builder.position_at_end(merge_bb)
-  return phi
+  merge_bb = paren_func.basic_blocks.append("ifthen_branch")
+  $builder.position_at_end(merge_bb)  
+
+  
+  phi = $builder.phi(LLVM::Int, {  then_bb => then_val ,  else_bb => else_val } ,"res")
+  $builder.position_at_end(start_bb) 
+  $builder.cond(cond_val,then_bb,else_bb)
+  $builder.position_at_end(then_bb)   
+  $builder.position_at_end(merge_bb) 
+  $builder.position_at_end(else_bb)   
+  return phi                                   
+  
 end
 
  
-=begin
-    if_branch_bb = builder.insert_block
-    builder.position_at_end( else_branch_bb)
-    builder.br(merge_bb)
-    else_branch_bb = builder.insert_block
-
-    
-    builder.position_at_end(merge_bb)
-    #hashmap holding the branches
-    incoming = Hash.new["if_branch_bb",1 ,"else_branch_bb",2]
-    phi = builder.phi(LLVM::Double, incoming ,"")
-    return phi;
-
-
 def create_args_allocas(vtype,name)
   valtype = $LLVM_types_hash[vtype]
   alloc = $builder.alloca(valtype,name.to_s)
