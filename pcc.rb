@@ -59,12 +59,13 @@ def walkNode(astNode)
       #when :ConstInt
        #  codegen_num(astNode)      #  return 1,astNode
       when :BinaryOp
-         #print nodeVal
           val = codegen_binary_expr(astNode)
+           return val
      # when :Variable
-      #   return codegen_expr_var(astNode)
+       #  return codegen_expr_var(astNode)
       when :Assignment
         val = codegen_assign(astNode)
+        return val
       when :IfStmt
         res = codegen_if_else(astNode)
         return res    
@@ -108,21 +109,17 @@ def create_function(funcNode)
     end
     $symbol_table[e] = val
     j = j + 1
+    create_args_allocas(v,e)   
   end
-
  
+  
   #we need to create a function type so that we can add it to the module
   point_func,func = codegen_func_proto(name,arg_types,ret_type) #This should return a function type
-
-  create_args_allocas(func,arg_types,arg_names)
-  #print func.params,"\n"
-  #return 
   entry = func.basic_blocks.append("entry")
+  #print func.params,"\n"
   $builder.position_at_end(entry);
-
-  block_code =  codegen_block(block)
-  #pos = $builder.insert_block.parent
   #print value.to_f
+  block_code =  codegen_block(block)
   $builder.ret(func)
   return func
 
@@ -154,37 +151,40 @@ end
 
 def codegen_block(funcBody)
   funcBody.child(0).each do |i|
-   len = $symbol_table.length
+   #len = $symbol_table.length
    if i.instance_of? Array #declaration
      d = i[0]
      c = i[1]
-     len = len+1
+    # len = len+1
      if d == "int"
        val = LLVM::Int
      elsif d == "Double"
        val == LLVM::Double
      end
- 
      $symbol_table[c] = val
      val = $LLVM_types_hash[d]
-     $builder.alloca(val,i[1])
+     $builder.alloca(val,c)
      next
    end
     #print $symbol_table,"\n"
     nodeval = walkNode(i)
+    #print nodeval,"\n"
     #print nodeval,"->nval\n"
+    #return nodeval
   end
-
 end
 
 
-def  codegen_num(node)
+def codegen_num(node,varname)
   v = node.value
   l = node.child(0)
   n = l.to_i
   c = LLVM::Int(n)
-  v_alloc = $builder.alloca(c)
+  v_alloc = $builder.alloca(c,varname)
   $builder.store(c,v_alloc)
+  #varhash[varname] = c
+  #print "vartable\n",varhash
+  #return 
   return c
 end
 
@@ -195,8 +195,11 @@ def another_walk_node(node)
   child = node.children
   case nval
   when :ConstInt
-   a =  codegen_num(node)   
-   return a
+    l = node.child(0)
+    n = l.to_i
+    c = LLVM::Int(n)
+    $builder.alloca(c)
+    return c
   when :Variable
     a =  codegen_expr_var(node)
     return a
@@ -208,13 +211,21 @@ def codegen_binary_expr(binode)
   op = binode.child(1)
   rhs = binode.child(2)
 
+  #if op ==  "=="
+  # var_res = codegen_expr_var(lhs)
+  #  rval = codegen_num(rhs)
+  #  print rval 
+  #  return 
+  #end
+
   lhs_ret = codegen_child_expr(lhs)
-  #print lhs_ret 
+
   rhs_ret = codegen_child_expr(rhs)
+  #print lhs_ret.type
 
   case op
   when '+'
-     val =  $builder.add(lhs_ret,rhs_ret,"addtmp")
+    val =  $builder.add(lhs_ret, rhs_ret,"addtmp")
   when '-'     
       val =  $builder.sub(lhs_ret, rhs_ret,"subtmp")
   when  '*'
@@ -225,20 +236,24 @@ def codegen_binary_expr(binode)
     tmp = $builder.fcmp(:ule, lhs, rhs)
     val =  $builder.(uitofp, tmp, LLVM::Double)
   end
-  alloc = $builder.alloca(val)
+
+
+  #alloc = $builder.alloca(val)
   # $builder.store(alloc,val)
+  return val 
 end   
 
 def codegen_child_expr(node)
   e = node.value
   case e
   when  :BinaryOp
-    codegen_binary_expr(node)
+    a =  codegen_binary_expr(node)
+    return a
   else
     a = another_walk_node(node)
-    vret = a
+    return  a
   end
-  return vret
+
 end
     
 def codegen_assign(node)
@@ -246,23 +261,27 @@ def codegen_assign(node)
   flag = check_init_var(var_name)
   vval =  node.child(1)
 
+  #print vval.value
   if flag == 1
     if vval.value == :ConstInt
-      var_val = codegen_num(vval)   
-    elsif :BinaryOp
+      var_val = codegen_num(vval,var_name)   
+      #print "Table->",
+      #return 
+    elsif vval.value == :BinaryOp
       var_val = codegen_binary_expr(vval)
+      alloc = $builder.alloca(var_val)
+      $builder.load(alloc,var_name)
     elsif :Variable
-       var_val = codegen_var_load(var_name,vval)
+      var_val = codegen_var_load(var,vval)
     else 
       var_val = codegen_func_call(vval)
     end
   end
- var_val = $builder.alloca(var_val)
- return var_val
+  return var_val
 end
 
 #codegen_var_load(var_name,vval)
-
+#Used to check if a variable being assigned to has been declared
 def check_init_var(name)
    if $symbol_table.has_key?(name)
      return 1
@@ -274,19 +293,23 @@ end
  
 #More work to be done
 def codegen_expr_var (varnode)
-  if $symbol_table.has_value?(v)
-      return v
+  v = varnode.child(0)
+  print "var->",v,"\n"
+  #print $symbol_table
+  if $symbol_table.has_key?(varnode)
+      return varnode
   else
-     raise "Uninitialized variable"
+     raise "No such var.Uninitialized variable"
   end 
 end
+
 
 
 def  codegen_if_else(node)
   cond =  node.child(0)
   if_true_block = node.child(1)
   else_stmt_block = node.child(2)
-  cond_expr_val = codegen_assign(cond)
+  cond_expr_val = codegen_binary_expr(cond)
   
   zero_val = LLVM::Int(0)
 
@@ -294,30 +317,33 @@ def  codegen_if_else(node)
  
   start_bb = $builder.insert_block
   paren_func = start_bb.parent
-  curr_bb = paren_func.basic_blocks.append("if_branch")
-
-  $builder.position_at_end(curr_bb)
+  then_bb = paren_func.basic_blocks.append("ifthen_branch")
+  $builder.position_at_end(then_bb)
 
   then_val = codegen_block(if_true_block)
-  then_bb = $builder.insert_block
+
+  new_then_bb = $builder.insert_block
 
   else_bb = paren_func.basic_blocks.append("else_branch")
   $builder.position_at_end(else_bb)
- 
   else_val = codegen_block(else_stmt_block)
+
   new_else_bb = $builder.insert_block
- 
   merge_bb = paren_func.basic_blocks.append("if_else_branch")
   $builder.position_at_end(merge_bb)
- 
-  incoming = Hash.new["then_val" => LLVM::Int(1) ,"new_else_bb" => LLVM::Int(2)]
+
+  print else_val,"\n"
+  print then_val,"\n","eeeeeeeeeeeeeeeee"
+  incoming = Hash.new["then_val" => "then_bb" ,"else_val" => "new_else_bb"]
+  
   phi = $builder.phi(LLVM::Int,incoming)
+  
   $builder.position_at_end(start_bb)
  
   $builder.position_at_end(then_bb)
   $builder.position_at_end(new_else_bb)
   $builder.position_at_end(merge_bb)
-
+  return phi
 end
 
  
@@ -333,11 +359,10 @@ end
     incoming = Hash.new["if_branch_bb",1 ,"else_branch_bb",2]
     phi = builder.phi(LLVM::Double, incoming ,"")
     return phi;
+
 =end
-
-
 def  create_alloca_ar (function, var)
-  bt = LLVM::Builder.new()      
+
   bb = LLVM::BasicBlock.new(function)
   r  = LLVM::Value.new()
 
@@ -349,12 +374,12 @@ def  create_alloca_ar (function, var)
 end
 
 
-def create_args_allocas(llvm_func,arg_types,arg_names)
-    arg_names.each do |i|
-    alloc = $builder.alloca(LLVM::Double(1),"")
-    # $builder.store(LLVM::Double(1),alloc)
-    end 
+def create_args_allocas(vtype,name)
+  valtype = $LLVM_types_hash[vtype]
+  alloc = $builder.alloca(valtype,name)
 end
+
+
 
 =begin
     alloca = create_alloca(fname, arg)
@@ -418,27 +443,6 @@ def codegen_prototype (funcnode)
 
   return fn;
 =end
-
-=begin
-def codegen_func(node)
-  #node.prettyprint STDOUT
-  
-  fn = LLVM::Value.new()
-  res = LLVM::Value.new()
-  bb = LLVM::BasicBlock.new()
-          
-  symbol_table.clear
-
-  fn = codegen_prototype(node)
-  create_argument_allocas(fn,node)
-  position_at_end(bb);
-  builder.ret(res)
-  pass_mgr.run(fn)
-  return  fn;
-
-=end
-
-
 
 =begin  
   old_scope = Hash.new
