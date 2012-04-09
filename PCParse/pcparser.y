@@ -137,7 +137,7 @@ function_def:
   compound_stmt:
     FOR '(' simple_stmt ';' expr ';' simple_stmt ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
   | WHILE '(' simple_stmt ')' block  { result = [val[0],val[2],val[4]] }
-  | IF '(' simple_stmt ')' block  optional_else  { result = [val[0],val[2] ,val[4] ,val[5]] }
+  | IF '(' simple_stmt ')' block  optional_else  { result = :IfStmt[val[2] ,val[4] ,val[5]] }
   ;
   
  /*Rules for optional else */
@@ -148,7 +148,7 @@ function_def:
   ;
   
   lval:
-    IDENTIFIER { result = :Variable[val[0]]}
+    IDENTIFIER { result = val[0]}
   | array_ref  
   | pointer_decl {result = val[0] }
   ;

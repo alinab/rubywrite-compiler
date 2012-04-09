@@ -540,14 +540,14 @@ module_eval(<<'.,.,', 'pcparser.y', 37)
 
 module_eval(<<'.,.,', 'pcparser.y', 42)
   def _reduce_9(val, _values, result)
-     result = [val[0] ,val[2]] 
+     result =val[0], val[2] 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'pcparser.y', 43)
   def _reduce_10(val, _values, result)
-     result = :Formals[val[0]] 
+     result = val[0] 
     result
   end
 .,.,
@@ -561,28 +561,28 @@ module_eval(<<'.,.,', 'pcparser.y', 47)
 
 module_eval(<<'.,.,', 'pcparser.y', 48)
   def _reduce_12(val, _values, result)
-     result = val[0] + val[1] 
+     result = val[0] , val[1] 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'pcparser.y', 49)
   def _reduce_13(val, _values, result)
-     result = val[0] + val[2] 
+     result = val[0] , val[2] 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'pcparser.y', 50)
   def _reduce_14(val, _values, result)
-     result = val[0] + val[1] 
+     result = val[0] , val[1] 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'pcparser.y', 51)
   def _reduce_15(val, _values, result)
-     result = val[0] + val[1] 
+     result = val[0] , val[1] 
     result
   end
 .,.,
@@ -804,7 +804,7 @@ module_eval(<<'.,.,', 'pcparser.y', 138)
 
 module_eval(<<'.,.,', 'pcparser.y', 139)
   def _reduce_51(val, _values, result)
-     result = [val[0],val[2] ,val[4] ,val[5]] 
+     result = :IfStmt[val[2] ,val[4] ,val[5]] 
     result
   end
 .,.,
@@ -832,7 +832,7 @@ module_eval(<<'.,.,', 'pcparser.y', 146)
 
 module_eval(<<'.,.,', 'pcparser.y', 150)
   def _reduce_55(val, _values, result)
-     result = :Variable[val[0]]
+     result = val[0]
     result
   end
 .,.,

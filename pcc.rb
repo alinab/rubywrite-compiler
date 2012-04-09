@@ -67,6 +67,8 @@ def walkNode(astNode)
       when :IfStmt
         res = codegen_if_else(astNode)
         return res    
+      when :FunctionCall
+        res = codegen_func_call(astNode)
       end       
 end
 
@@ -80,7 +82,7 @@ def programN(node)
   end
   $testMod.verify
   $testMod.dump
-  value = $engine.run_function($testMod.functions["test"],2.to_i ,10.to_i)
+  value = $engine.run_function($testMod.functions["test"],20,10)
   $testMod.dispose
   $builder.dispose
   print "done\n"
@@ -107,9 +109,9 @@ def create_function(funcNode)
     arg_names.insert(j,e)
     v = type_hash[t]
     if v == "int"
-       val = LLVM::Int
-    elsif v == "Double"
-       val == LLVM::Double
+       val = LLVM::Int(1)
+    elsif v == "double"
+       val == LLVM::Double(1)
     end
     $symbol_table[e] = val
     j = j + 1
@@ -314,7 +316,12 @@ def codegen_stmt_block(blocknode)
 end
 
 
-
+def codegen_func_call(node)
+   name = node.child(0)
+#  func_list =  $testMod.functions 
+   print name
+  return 
+end  
 
 def  codegen_if_else(node)
   cond =  node.child(0)
@@ -357,7 +364,7 @@ end
  
 def create_args_allocas(vtype,name)
   valtype = $LLVM_types_hash[vtype]
-  alloc = $builder.alloca(valtype,name.to_s)
+  alloc = $builder.alloca(valtype,name)
 end
 
 
