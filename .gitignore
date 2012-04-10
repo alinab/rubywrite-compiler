@@ -1,0 +1,8 @@
+# Compiled sources #
+####################
+*.o
+*.so
+*.l
+*.exe
+
+
