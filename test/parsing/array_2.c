@@ -8,7 +8,7 @@ int main()
   b = a;
   i = 0;
   foo(b);
-  while(a[i] != NULL){
+  while(a[i] != "NULL"){
     printf("%c",a[i]);
     i = i + 1;
   }

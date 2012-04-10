@@ -23,7 +23,7 @@ target:
    3.empty - No declarations of any type */
  program:
     function_defs  { result = val[0] }
-  | type_decls function_defs { result = val[0] + val[1] } /*Remove type_decls from this and below line */
+  | type_decls function_defs { result = val[0] + val[1]  } /*Remove type_decls from this and below line */
   | type_decls { result = val[0] }
   | { result = [] }
 
@@ -39,18 +39,18 @@ function_def:
 /* | typename IDENTIFIER '(' ')' block  { result = :Function[val[0],val[1],,val[4]] } */
   ;
 
-formal_params:
-    formal_params ',' formal_param  { result = [val[0] ,val[2]] }
-  | formal_param  { result = :Formals[val[0]] }
+  formal_params:
+    formal_params ',' formal_param  { result =val[0], val[2] }
+  | formal_param  { result = val[0] }
   ;
 
   formal_param:
     typename  { result = val[0] }
-  | typename IDENTIFIER  { result = val[0] + val[1] }
-  | typename '&' IDENTIFIER  { result = val[0] + val[2] }
-  | typename array_formal  { result = val[0] + val[1] }
-  | typename pointer_decl  { result = val[0] + val[1] }
-  | { result = []}
+  | typename IDENTIFIER  { result = val[0] , val[1] }
+  | typename '&' IDENTIFIER  { result = val[0] , val[2] }
+  | typename array_formal  { result = val[0] , val[1] }
+  | typename pointer_decl  { result = val[0] , val[1] }
+  | { result = [] }
   ;
  
    typename:
@@ -62,14 +62,14 @@ formal_params:
  
   /*Rule defining a declaration with a type and a list of one or more variables/functions */
     type_decl:
-    typename decl_list ';'{ result = [val[0], val[1]] }
+    typename decl_list ';'{ result = [val[0],val[1]] }
     ;
  
   /* Rule defining single declaration or a list of declarations */
     decl_list:
     decl_list ',' lval { result = val[0] + ' ' + val[2]  }
-/*   | expr     Putting decl here gives rise to reduce/reduce conflicts */ 
-    | expr
+ /*| expr     Putting decl here gives rise to reduce/reduce conflicts */ 
+   | lval
    ;
 
 
@@ -82,11 +82,11 @@ formal_params:
 /* Rule defining a function declaration */
    fn_decl:
     IDENTIFIER '(' ')'  { result = [val[0],:Formals[[]]] }
-  | IDENTIFIER '(' formal_params ')' { result = val[0] + :Formals[val[2]] }
+  | IDENTIFIER '(' formal_params ')' { result = [val[0],:Formals[val[2]]] }
   ;
 
   array_formal:
-    IDENTIFIER array_formal_subs  { result = :ArrayArg[val[0]] +  val[1] }
+    IDENTIFIER array_formal_subs  { result = val[0] + val[1] }
   ;
 
   array_formal_subs:
@@ -99,13 +99,10 @@ formal_params:
   | '[' ']'  { result = :EmptySubscript[] }
   ;
 
- block:
+  block:
    '{' stmt_list '}'  { result = :Block[val[1]] }
   ;
-/*
-  block:
-  '{' type_decls '}'  { result = val[1] }
-  ;*/
+
   block:
     { result = [] }
     ;
@@ -139,25 +136,26 @@ formal_params:
  /* Rules for compound statements */
   compound_stmt:
     FOR '(' simple_stmt ';' expr ';' simple_stmt ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
-  | WHILE '(' simple_stmt ')' '{' stmt_list '}'  { result = :WhileStmt[val[0],val[2],val[5]] }
-  | IF '(' simple_stmt ')' '{' stmt_list '}'  optional_else  { result =:IfStmt[val[0] , val[2] ,val[5] ,val[7]] }
+  | WHILE '(' simple_stmt ')' block  { result = [val[0],val[2],val[4]] }
+  | IF '(' simple_stmt ')' block  optional_else  { result = :IfStmt[val[2] ,val[4] ,val[5]] }
   ;
   
  /*Rules for optional else */
    optional_else:
-    ELSE  { result = [] }
-  | ELSE '{' stmt_list '}'  { result = :ElseStmt[val[0],val[1]] }
+    { result = [] }
+  | ELSE  { result = [] }
+  | ELSE '{' stmt_list '}'  { result = :ElseStmt[val[2]] }
   ;
   
   lval:
-    IDENTIFIER 
-  | array_ref 
+    IDENTIFIER { result = val[0]}
+  | array_ref  
   | pointer_decl {result = val[0] }
   ;
 
 
 expr:
-    IDENTIFIER { result = val[0] }
+    IDENTIFIER { result = :Variable[val[0]] }
   | INT_NUM  { result = :ConstInt[val[0]] }
   | REAL_NUM  { result = :ConstReal[val[0]] }
   | STRING  { result = :ConstString[val[0]] }
@@ -178,7 +176,7 @@ expr:
 
 
   array_ref:
-   IDENTIFIER '[' array_index_list ']'  { result = :ArrayRef[val[0],val[2]] }
+  IDENTIFIER '[' array_index_list ']'  { result = :ArrayRef[val[0] ,val[2]] }
   ;
 
   array_index_list:
@@ -192,9 +190,9 @@ expr:
   ;
 
   actual_params:
-    actual_params ','expr  { result = val[0] + [val[2]] } 
-   | expr { result = [val[0]] }
-  ;
+     actual_params ',' expr { result = val[0] + [val[2]] } 
+   | expr { result = [val[0]] } 
+   ;
 
 end
 

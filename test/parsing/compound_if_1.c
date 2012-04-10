@@ -10,5 +10,7 @@ int main()
       }
     }  
   else
-  printf("b %d\n",b);
+  {
+   printf("b %d\n",b);
+  }
 }

@@ -9,6 +9,7 @@ int main()
     print("a,b,c %d %d %d\n",a,b,c);
     b = b + a;
     if(b < 35) {
+      a = a - 1 + 4;
       continue ;
     }
     else {
