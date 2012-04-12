@@ -22,7 +22,10 @@
 #define DEFAULT 278
 #define COMMENT 279
 #define LEXICAL_ERROR 280
-#define END_OF_INPUT 281
+#define PRAGMA 281
+#define OMP 282
+#define PARALLEL 283
+#define END_OF_INPUT 284
 
 #ifdef _INCLUDED_FROM_SCANNER_
 const char* token_name[] = {
@@ -49,7 +52,11 @@ const char* token_name[] = {
   "DEFAULT",
   "COMMENT",
   "LEXICAL_ERROR",
+   "PRAGMA",
+  "OMP",
+  "PARALLEL", 
   "END_OF_INPUT",
+
 };
 
 int first_token = 258;

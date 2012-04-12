@@ -390,9 +390,13 @@ class UnparsePidginC
             body)
       end
       rule :Block do |block| 
-      v({  },'{' ,*block.children ,'}') end
+      v({  },'{' ,*block.children ,'}') 
+      end
+      rule :TypeDecls do |type ,vars|
+        h({:hs => 1}, type, ' ' , vars , ';')
+      end
       rule :Assignment do |lhs,rhs|
-        h({:hs => 2}, lhs,'=', rhs,';')
+        h({:hs => 1}, lhs,'=', rhs,';')
       end
       rule :BinaryOp do |rand1, op, rand2|
         h({:hs => 1}, rand1, op, rand2)
@@ -436,9 +440,9 @@ class UnparsePidginC
       rule :ArrayRef do |name,args|
         h({},name,'[',*args.children,']')
       end
-      rule :FunctionCall do |func, args|
-        h({}, func, "(", args, ")")
-      end
+      #rule :FunctionCall do |func, args|
+      #  h({}, func, "(", args, ")")
+      #end
       rule :Formals do |args|
         v({}, *args.children)
       end
@@ -449,7 +453,7 @@ class UnparsePidginC
         h({}, num)
       end
       rule :ConstString do |str|
-        h({}, str)
+        h({}, *str)
       end
       rule :Identifier do |i|
         h({}, i)
@@ -458,10 +462,18 @@ class UnparsePidginC
         v({}, p_var)
       end
       rule :TypeDecl do |t_var|
-        h({}, t_var)
+        h({}, *t_var.children)
       end
-      rule :FunctionCall do |func_call|
-        h({}, func_call)
+      rule :FunctionCall do |func_call ,args|
+        h({}, *func_call ,"(" ,
+          h_star({:hs => 1},',' ,*args.children ) ,")" ,';')
+      end
+      rule :Variable  do |var|
+        h({}, var)
+      end
+      rule :parallelPragmaBlock do |  pblock| 
+          v({ }, "#pragma omp parallel" ,
+            v({ }, *pblock.children))
       end
     end
 
@@ -485,6 +497,9 @@ opts = OptionParser.new do |opts|
   end
   opts.on("-ll","--llvm-code-gen", "LLVM Code generation") do |llvm_codegen|
     options[:ll] = llvm_codegen()
+  end
+   opts.on("-ll","--progam-codegen", "Pragma Code Generation") do |prag|
+    options[:o] = pragma_codegen
   end
 end
 

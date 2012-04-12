@@ -119,6 +119,17 @@ while {
   return WHILE;
 }
 
+pragma {
+  return PRAGMA;
+  }
+
+omp {
+ return OMP;
+ }
+
+parallel {
+ return PARALLEL;
+ }
 
 %{
   /* Operators.  Since '*', '+', and '-' are also unary operators these are

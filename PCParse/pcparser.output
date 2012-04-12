@@ -1,8 +1,10 @@
 state 42 contains 1 shift/reduce conflicts
 state 42 contains 3 reduce/reduce conflicts
-state 72 contains 1 shift/reduce conflicts
-state 98 contains 3 reduce/reduce conflicts
-state 112 contains 1 shift/reduce conflicts
+state 73 contains 1 shift/reduce conflicts
+state 73 contains 2 reduce/reduce conflicts
+state 96 contains 1 shift/reduce conflicts
+state 100 contains 3 reduce/reduce conflicts
+state 115 contains 1 shift/reduce conflicts
 
 
 -------- Grammar --------
@@ -47,133 +49,135 @@ rule 37 stmt: compound_stmt
 rule 38 stmt: type_decl
 rule 39 stmt: pointer_decl
 rule 40 stmt: fn_decl
-rule 41 simple_stmt: lval "=" expr
-rule 42 simple_stmt: BREAK
-rule 43 simple_stmt: CONTINUE
-rule 44 simple_stmt: RETURN
-rule 45 simple_stmt: RETURN expr
-rule 46 simple_stmt: expr
-rule 47 simple_stmt: pointer_decl "=" expr
-rule 48 simple_stmt: lval "=" "&" expr
-rule 49 compound_stmt: FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}"
-rule 50 compound_stmt: WHILE "(" simple_stmt ")" block
-rule 51 compound_stmt: IF "(" simple_stmt ")" block optional_else
-rule 52 optional_else: 
-rule 53 optional_else: ELSE
-rule 54 optional_else: ELSE "{" stmt_list "}"
-rule 55 lval: IDENTIFIER
-rule 56 lval: array_ref
-rule 57 lval: pointer_decl
-rule 58 expr: IDENTIFIER
-rule 59 expr: INT_NUM
-rule 60 expr: REAL_NUM
-rule 61 expr: STRING
-rule 62 expr: function_call
-rule 63 expr: array_ref
-rule 64 expr: expr "+" expr
-rule 65 expr: expr "-" expr
-rule 66 expr: expr "*" expr
-rule 67 expr: expr "/" expr
-rule 68 expr: expr BOOL_OP expr
-rule 69 expr: expr REL_OP expr
-rule 70 expr: "-" expr
-rule 71 expr: "+" expr
-rule 72 expr: PREFIX_OP expr
-rule 73 expr: "(" expr ")"
-rule 74 expr: pointer_decl
-rule 75 array_ref: IDENTIFIER "[" array_index_list "]"
-rule 76 array_index_list: array_index_list "]" "[" expr
-rule 77 array_index_list: expr
-rule 78 function_call: IDENTIFIER "(" actual_params ")"
-rule 79 function_call: IDENTIFIER "(" ")"
-rule 80 actual_params: actual_params "," expr
-rule 81 actual_params: expr
+rule 41 stmt: PRAGMA OMP PARALLEL "{" stmt_list "}"
+rule 42 simple_stmt: lval "=" expr
+rule 43 simple_stmt: BREAK
+rule 44 simple_stmt: CONTINUE
+rule 45 simple_stmt: RETURN
+rule 46 simple_stmt: RETURN expr
+rule 47 simple_stmt: expr
+rule 48 simple_stmt: pointer_decl "=" expr
+rule 49 simple_stmt: lval "=" "&" expr
+rule 50 compound_stmt: FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}"
+rule 51 compound_stmt: WHILE "(" simple_stmt ")" block
+rule 52 compound_stmt: IF "(" simple_stmt ")" block optional_else
+rule 53 optional_else: 
+rule 54 optional_else: ELSE
+rule 55 optional_else: ELSE "{" stmt_list "}"
+rule 56 lval: IDENTIFIER
+rule 57 lval: array_ref
+rule 58 lval: pointer_decl
+rule 59 expr: IDENTIFIER
+rule 60 expr: INT_NUM
+rule 61 expr: REAL_NUM
+rule 62 expr: STRING
+rule 63 expr: function_call
+rule 64 expr: array_ref
+rule 65 expr: expr "+" expr
+rule 66 expr: expr "-" expr
+rule 67 expr: expr "*" expr
+rule 68 expr: expr "/" expr
+rule 69 expr: expr BOOL_OP expr
+rule 70 expr: expr REL_OP expr
+rule 71 expr: "-" expr
+rule 72 expr: "+" expr
+rule 73 expr: PREFIX_OP expr
+rule 74 expr: "(" expr ")"
+rule 75 expr: pointer_decl
+rule 76 array_ref: IDENTIFIER "[" array_index_list "]"
+rule 77 array_index_list: array_index_list "]" "[" expr
+rule 78 array_index_list: expr
+rule 79 function_call: IDENTIFIER "(" actual_params ")"
+rule 80 function_call: IDENTIFIER "(" ")"
+rule 81 actual_params: actual_params "," expr
+rule 82 actual_params: expr
+rule 83 actual_params: 
 
 ------- Symbols -------
 
 **Nonterminals, with rules where they appear
 
-  $start (38)
+  $start (41)
     on right: 
     on left : 
-  target (39)
+  target (42)
     on right: 
     on left : 1
-  program (40)
+  program (43)
     on right: 1
     on left : 2 3 4 5
-  function_defs (41)
+  function_defs (44)
     on right: 2 3 6
     on left : 6 7
-  function_def (42)
+  function_def (45)
     on right: 6 7
     on left : 8
-  typename (43)
+  typename (46)
     on right: 8 11 12 13 14 15 21
     on left : 17 18 19 20
-  formal_params (44)
+  formal_params (47)
     on right: 8 9 26
     on left : 9 10
-  block (45)
-    on right: 8 50 51
+  block (48)
+    on right: 8 51 52
     on left : 32 33
-  formal_param (46)
+  formal_param (49)
     on right: 9 10
     on left : 11 12 13 14 15 16
-  array_formal (47)
+  array_formal (50)
     on right: 14
     on left : 27
-  pointer_decl (48)
-    on right: 15 39 47 57 74
+  pointer_decl (51)
+    on right: 15 39 48 58 75
     on left : 24
-  type_decl (49)
+  type_decl (52)
     on right: 38
     on left : 21
-  decl_list (50)
+  decl_list (53)
     on right: 21 22
     on left : 22 23
-  lval (51)
-    on right: 22 23 41 48
-    on left : 55 56 57
-  fn_decl (52)
+  lval (54)
+    on right: 22 23 42 49
+    on left : 56 57 58
+  fn_decl (55)
     on right: 40
     on left : 25 26
-  array_formal_subs (53)
+  array_formal_subs (56)
     on right: 27 28
     on left : 28 29
-  array_formal_sub (54)
+  array_formal_sub (57)
     on right: 28 29
     on left : 30 31
-  expr (55)
-    on right: 30 41 45 46 47 48 49 64 65 66 67 68 69 70 71 72 73 76 77 80 81
-    on left : 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74
-  stmt_list (56)
-    on right: 32 34 49 54
+  expr (58)
+    on right: 30 42 46 47 48 49 50 65 66 67 68 69 70 71 72 73 74 77 78 81 82
+    on left : 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75
+  stmt_list (59)
+    on right: 32 34 41 50 55
     on left : 34 35
-  stmt (57)
+  stmt (60)
     on right: 34 35
-    on left : 36 37 38 39 40
-  simple_stmt (58)
-    on right: 36 49 50 51
-    on left : 41 42 43 44 45 46 47 48
-  compound_stmt (59)
+    on left : 36 37 38 39 40 41
+  simple_stmt (61)
+    on right: 36 50 51 52
+    on left : 42 43 44 45 46 47 48 49
+  compound_stmt (62)
     on right: 37
-    on left : 49 50 51
-  optional_else (60)
-    on right: 51
-    on left : 52 53 54
-  array_ref (61)
-    on right: 56 63
-    on left : 75
-  function_call (62)
-    on right: 62
-    on left : 78 79
-  array_index_list (63)
-    on right: 75 76
-    on left : 76 77
-  actual_params (64)
-    on right: 78 80
-    on left : 80 81
+    on left : 50 51 52
+  optional_else (63)
+    on right: 52
+    on left : 53 54 55
+  array_ref (64)
+    on right: 57 64
+    on left : 76
+  function_call (65)
+    on right: 63
+    on left : 79 80
+  array_index_list (66)
+    on right: 76 77
+    on left : 77 78
+  actual_params (67)
+    on right: 79 81
+    on left : 81 82 83
 
 **Terminals, with rules where they appear
 
@@ -182,39 +186,42 @@ rule 81 actual_params: expr
   UMINUS (2) 
   UPLUS (3) 
   PREFIXOP (4) 
-  "*" (5) 24 66
-  "/" (6) 67
-  "+" (7) 64 71
-  "-" (8) 65 70
-  BOOL_OP (9) 68
-  REL_OP (10) 69
+  "*" (5) 24 67
+  "/" (6) 68
+  "+" (7) 65 72
+  "-" (8) 66 71
+  BOOL_OP (9) 69
+  REL_OP (10) 70
   type_decls (11) 3 4
-  IDENTIFIER (12) 8 12 13 24 25 26 27 55 58 75 78 79
-  "(" (13) 8 25 26 49 50 51 73 78 79
-  ")" (14) 8 25 26 49 50 51 73 78 79
-  "," (15) 9 22 80
-  "&" (16) 13 48
+  IDENTIFIER (12) 8 12 13 24 25 26 27 56 59 76 79 80
+  "(" (13) 8 25 26 50 51 52 74 79 80
+  ")" (14) 8 25 26 50 51 52 74 79 80
+  "," (15) 9 22 81
+  "&" (16) 13 49
   CHAR (17) 17
   INT (18) 18
   DOUBLE (19) 19
   VOID (20) 20
-  ";" (21) 21 36 49
-  "[" (22) 30 31 75 76
-  "]" (23) 30 31 75 76
-  "{" (24) 32 49 54
-  "}" (25) 32 49 54
-  "=" (26) 41 47 48
-  BREAK (27) 42
-  CONTINUE (28) 43
-  RETURN (29) 44 45
-  FOR (30) 49
-  WHILE (31) 50
-  IF (32) 51
-  ELSE (33) 53 54
-  INT_NUM (34) 59
-  REAL_NUM (35) 60
-  STRING (36) 61
-  PREFIX_OP (37) 72
+  ";" (21) 21 36 50
+  "[" (22) 30 31 76 77
+  "]" (23) 30 31 76 77
+  "{" (24) 32 41 50 55
+  "}" (25) 32 41 50 55
+  PRAGMA (26) 41
+  OMP (27) 41
+  PARALLEL (28) 41
+  "=" (29) 42 48 49
+  BREAK (30) 43
+  CONTINUE (31) 44
+  RETURN (32) 45 46
+  FOR (33) 50
+  WHILE (34) 51
+  IF (35) 52
+  ELSE (36) 54 55
+  INT_NUM (37) 60
+  REAL_NUM (38) 61
+  STRING (39) 62
+  PREFIX_OP (40) 73
 
 --------- State ---------
 
@@ -477,24 +484,25 @@ state 28
   32) block : "{" _ stmt_list "}"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
   IDENTIFIER    shift, and go to state 36
-  "("           shift, and go to state 60
+  "("           shift, and go to state 61
   CHAR          shift, and go to state 7
   INT           shift, and go to state 8
   DOUBLE        shift, and go to state 9
   VOID          shift, and go to state 10
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  FOR           shift, and go to state 49
-  WHILE         shift, and go to state 50
-  IF            shift, and go to state 51
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
   typename      go to state 35
   stmt_list     go to state 37
@@ -504,10 +512,10 @@ state 28
   type_decl     go to state 41
   pointer_decl  go to state 42
   fn_decl       go to state 43
-  lval          go to state 44
-  expr          go to state 48
-  array_ref     go to state 52
-  function_call  go to state 56
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
 
 state 29
 
@@ -524,7 +532,7 @@ state 30
   "["           shift, and go to state 32
   $default      reduce using rule 27 (array_formal)
 
-  array_formal_sub  go to state 61
+  array_formal_sub  go to state 62
 
 state 31
 
@@ -539,20 +547,20 @@ state 32
   31) array_formal_sub : "[" _ "]"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  "]"           shift, and go to state 63
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  "]"           shift, and go to state 64
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  expr          go to state 62
-  function_call  go to state 56
-  array_ref     go to state 65
-  pointer_decl  go to state 66
+  expr          go to state 63
+  function_call  go to state 57
+  array_ref     go to state 66
+  pointer_decl  go to state 67
 
 state 33
 
@@ -573,27 +581,27 @@ state 35
   21) type_decl : typename _ decl_list ";"
 
   "*"           shift, and go to state 26
-  IDENTIFIER    shift, and go to state 69
+  IDENTIFIER    shift, and go to state 70
 
-  decl_list     go to state 67
-  lval          go to state 68
-  array_ref     go to state 70
-  pointer_decl  go to state 71
+  decl_list     go to state 68
+  lval          go to state 69
+  array_ref     go to state 71
+  pointer_decl  go to state 72
 
 state 36
 
   25) fn_decl : IDENTIFIER _ "(" ")"
   26) fn_decl : IDENTIFIER _ "(" formal_params ")"
-  55) lval : IDENTIFIER _
-  58) expr : IDENTIFIER _
-  75) array_ref : IDENTIFIER _ "[" array_index_list "]"
-  78) function_call : IDENTIFIER _ "(" actual_params ")"
-  79) function_call : IDENTIFIER _ "(" ")"
+  56) lval : IDENTIFIER _
+  59) expr : IDENTIFIER _
+  76) array_ref : IDENTIFIER _ "[" array_index_list "]"
+  79) function_call : IDENTIFIER _ "(" actual_params ")"
+  80) function_call : IDENTIFIER _ "(" ")"
 
-  "("           shift, and go to state 72
-  "["           shift, and go to state 73
-  "="           reduce using rule 55 (lval)
-  $default      reduce using rule 58 (expr)
+  "("           shift, and go to state 73
+  "["           shift, and go to state 74
+  "="           reduce using rule 56 (lval)
+  $default      reduce using rule 59 (expr)
 
 
 state 37
@@ -602,37 +610,38 @@ state 37
   34) stmt_list : stmt_list _ stmt
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
   IDENTIFIER    shift, and go to state 36
-  "("           shift, and go to state 60
+  "("           shift, and go to state 61
   CHAR          shift, and go to state 7
   INT           shift, and go to state 8
   DOUBLE        shift, and go to state 9
   VOID          shift, and go to state 10
-  "}"           shift, and go to state 74
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  FOR           shift, and go to state 49
-  WHILE         shift, and go to state 50
-  IF            shift, and go to state 51
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "}"           shift, and go to state 75
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
   typename      go to state 35
-  stmt          go to state 75
+  stmt          go to state 76
   simple_stmt   go to state 39
   compound_stmt  go to state 40
   type_decl     go to state 41
   pointer_decl  go to state 42
   fn_decl       go to state 43
-  lval          go to state 44
-  expr          go to state 48
-  array_ref     go to state 52
-  function_call  go to state 56
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
 
 state 38
 
@@ -645,7 +654,7 @@ state 39
 
   36) stmt : simple_stmt _ ";"
 
-  ";"           shift, and go to state 76
+  ";"           shift, and go to state 77
 
 
 state 40
@@ -665,19 +674,19 @@ state 41
 state 42
 
   39) stmt : pointer_decl _
-  47) simple_stmt : pointer_decl _ "=" expr
-  57) lval : pointer_decl _
-  74) expr : pointer_decl _
+  48) simple_stmt : pointer_decl _ "=" expr
+  58) lval : pointer_decl _
+  75) expr : pointer_decl _
 
-  "="           shift, and go to state 77
-  "="           [reduce using rule 57 (lval)]
-  "/"           reduce using rule 74 (expr)
-  BOOL_OP       reduce using rule 74 (expr)
-  REL_OP        reduce using rule 74 (expr)
-  ";"           reduce using rule 74 (expr)
-  "*"           [reduce using rule 74 (expr)]
-  "+"           [reduce using rule 74 (expr)]
-  "-"           [reduce using rule 74 (expr)]
+  "="           shift, and go to state 78
+  "="           [reduce using rule 58 (lval)]
+  "/"           reduce using rule 75 (expr)
+  BOOL_OP       reduce using rule 75 (expr)
+  REL_OP        reduce using rule 75 (expr)
+  ";"           reduce using rule 75 (expr)
+  "*"           [reduce using rule 75 (expr)]
+  "+"           [reduce using rule 75 (expr)]
+  "-"           [reduce using rule 75 (expr)]
   $default      reduce using rule 39 (stmt)
 
 
@@ -690,1420 +699,1533 @@ state 43
 
 state 44
 
-  41) simple_stmt : lval _ "=" expr
-  48) simple_stmt : lval _ "=" "&" expr
+  41) stmt : PRAGMA _ OMP PARALLEL "{" stmt_list "}"
 
-  "="           shift, and go to state 78
+  OMP           shift, and go to state 79
 
 
 state 45
 
-  42) simple_stmt : BREAK _
+  42) simple_stmt : lval _ "=" expr
+  49) simple_stmt : lval _ "=" "&" expr
 
-  $default      reduce using rule 42 (simple_stmt)
+  "="           shift, and go to state 80
 
 
 state 46
 
-  43) simple_stmt : CONTINUE _
+  43) simple_stmt : BREAK _
 
   $default      reduce using rule 43 (simple_stmt)
 
 
 state 47
 
-  44) simple_stmt : RETURN _
-  45) simple_stmt : RETURN _ expr
+  44) simple_stmt : CONTINUE _
 
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
   $default      reduce using rule 44 (simple_stmt)
 
-  expr          go to state 79
-  function_call  go to state 56
-  array_ref     go to state 65
-  pointer_decl  go to state 66
 
 state 48
 
-  46) simple_stmt : expr _
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  45) simple_stmt : RETURN _
+  46) simple_stmt : RETURN _ expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 46 (simple_stmt)
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+  $default      reduce using rule 45 (simple_stmt)
 
+  expr          go to state 81
+  function_call  go to state 57
+  array_ref     go to state 66
+  pointer_decl  go to state 67
 
 state 49
 
-  49) compound_stmt : FOR _ "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}"
+  47) simple_stmt : expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "("           shift, and go to state 86
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 47 (simple_stmt)
 
 
 state 50
 
-  50) compound_stmt : WHILE _ "(" simple_stmt ")" block
-
-  "("           shift, and go to state 87
-
-
-state 51
-
-  51) compound_stmt : IF _ "(" simple_stmt ")" block optional_else
+  50) compound_stmt : FOR _ "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}"
 
   "("           shift, and go to state 88
 
 
+state 51
+
+  51) compound_stmt : WHILE _ "(" simple_stmt ")" block
+
+  "("           shift, and go to state 89
+
+
 state 52
 
-  56) lval : array_ref _
-  63) expr : array_ref _
+  52) compound_stmt : IF _ "(" simple_stmt ")" block optional_else
 
-  "="           reduce using rule 56 (lval)
-  $default      reduce using rule 63 (expr)
+  "("           shift, and go to state 90
 
 
 state 53
 
-  59) expr : INT_NUM _
+  57) lval : array_ref _
+  64) expr : array_ref _
 
-  $default      reduce using rule 59 (expr)
+  "="           reduce using rule 57 (lval)
+  $default      reduce using rule 64 (expr)
 
 
 state 54
 
-  60) expr : REAL_NUM _
+  60) expr : INT_NUM _
 
   $default      reduce using rule 60 (expr)
 
 
 state 55
 
-  61) expr : STRING _
+  61) expr : REAL_NUM _
 
   $default      reduce using rule 61 (expr)
 
 
 state 56
 
-  62) expr : function_call _
+  62) expr : STRING _
 
   $default      reduce using rule 62 (expr)
 
 
 state 57
 
-  70) expr : "-" _ expr
+  63) expr : function_call _
 
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  $default      reduce using rule 63 (expr)
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 89
-  pointer_decl  go to state 66
 
 state 58
 
-  71) expr : "+" _ expr
+  71) expr : "-" _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 90
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 91
+  pointer_decl  go to state 67
 
 state 59
 
-  72) expr : PREFIX_OP _ expr
+  72) expr : "+" _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 91
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 92
+  pointer_decl  go to state 67
 
 state 60
 
-  73) expr : "(" _ expr ")"
+  73) expr : PREFIX_OP _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 92
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 93
+  pointer_decl  go to state 67
 
 state 61
+
+  74) expr : "(" _ expr ")"
+
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 94
+  pointer_decl  go to state 67
+
+state 62
 
   28) array_formal_subs : array_formal_subs array_formal_sub _
 
   $default      reduce using rule 28 (array_formal_subs)
 
 
-state 62
+state 63
 
   30) array_formal_sub : "[" expr _ "]"
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  "]"           shift, and go to state 93
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  "]"           shift, and go to state 95
 
 
-state 63
+state 64
 
   31) array_formal_sub : "[" "]" _
 
   $default      reduce using rule 31 (array_formal_sub)
 
 
-state 64
-
-  58) expr : IDENTIFIER _
-  75) array_ref : IDENTIFIER _ "[" array_index_list "]"
-  78) function_call : IDENTIFIER _ "(" actual_params ")"
-  79) function_call : IDENTIFIER _ "(" ")"
-
-  "("           shift, and go to state 94
-  "["           shift, and go to state 73
-  $default      reduce using rule 58 (expr)
-
-
 state 65
 
-  63) expr : array_ref _
+  59) expr : IDENTIFIER _
+  76) array_ref : IDENTIFIER _ "[" array_index_list "]"
+  79) function_call : IDENTIFIER _ "(" actual_params ")"
+  80) function_call : IDENTIFIER _ "(" ")"
 
-  $default      reduce using rule 63 (expr)
+  "("           shift, and go to state 96
+  "["           shift, and go to state 74
+  $default      reduce using rule 59 (expr)
 
 
 state 66
 
-  74) expr : pointer_decl _
+  64) expr : array_ref _
 
-  $default      reduce using rule 74 (expr)
+  $default      reduce using rule 64 (expr)
 
 
 state 67
 
-  21) type_decl : typename decl_list _ ";"
-  22) decl_list : decl_list _ "," lval
+  75) expr : pointer_decl _
 
-  ","           shift, and go to state 96
-  ";"           shift, and go to state 95
+  $default      reduce using rule 75 (expr)
 
 
 state 68
+
+  21) type_decl : typename decl_list _ ";"
+  22) decl_list : decl_list _ "," lval
+
+  ","           shift, and go to state 98
+  ";"           shift, and go to state 97
+
+
+state 69
 
   23) decl_list : lval _
 
   $default      reduce using rule 23 (decl_list)
 
 
-state 69
-
-  55) lval : IDENTIFIER _
-  75) array_ref : IDENTIFIER _ "[" array_index_list "]"
-
-  "["           shift, and go to state 73
-  $default      reduce using rule 55 (lval)
-
-
 state 70
 
-  56) lval : array_ref _
+  56) lval : IDENTIFIER _
+  76) array_ref : IDENTIFIER _ "[" array_index_list "]"
 
+  "["           shift, and go to state 74
   $default      reduce using rule 56 (lval)
 
 
 state 71
 
-  57) lval : pointer_decl _
+  57) lval : array_ref _
 
   $default      reduce using rule 57 (lval)
 
 
 state 72
 
+  58) lval : pointer_decl _
+
+  $default      reduce using rule 58 (lval)
+
+
+state 73
+
   25) fn_decl : IDENTIFIER "(" _ ")"
   26) fn_decl : IDENTIFIER "(" _ formal_params ")"
-  78) function_call : IDENTIFIER "(" _ actual_params ")"
-  79) function_call : IDENTIFIER "(" _ ")"
+  79) function_call : IDENTIFIER "(" _ actual_params ")"
+  80) function_call : IDENTIFIER "(" _ ")"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  ")"           shift, and go to state 98
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  ")"           shift, and go to state 100
   ")"           [reduce using rule 16 (formal_param)]
+  ")"           [reduce using rule 83 (actual_params)]
   CHAR          shift, and go to state 7
   INT           shift, and go to state 8
   DOUBLE        shift, and go to state 9
   VOID          shift, and go to state 10
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+  ","           [reduce using rule 83 (actual_params)]
   $default      reduce using rule 16 (formal_param)
 
-  formal_params  go to state 97
+  formal_params  go to state 99
   formal_param  go to state 18
   typename      go to state 19
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 99
-  pointer_decl  go to state 66
-  actual_params  go to state 100
-
-state 73
-
-  75) array_ref : IDENTIFIER "[" _ array_index_list "]"
-
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
-
-  function_call  go to state 56
-  array_ref     go to state 65
+  function_call  go to state 57
+  array_ref     go to state 66
   expr          go to state 101
-  pointer_decl  go to state 66
-  array_index_list  go to state 102
+  pointer_decl  go to state 67
+  actual_params  go to state 102
 
 state 74
+
+  76) array_ref : IDENTIFIER "[" _ array_index_list "]"
+
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 103
+  pointer_decl  go to state 67
+  array_index_list  go to state 104
+
+state 75
 
   32) block : "{" stmt_list "}" _
 
   $default      reduce using rule 32 (block)
 
 
-state 75
+state 76
 
   34) stmt_list : stmt_list stmt _
 
   $default      reduce using rule 34 (stmt_list)
 
 
-state 76
+state 77
 
   36) stmt : simple_stmt ";" _
 
   $default      reduce using rule 36 (stmt)
 
 
-state 77
-
-  47) simple_stmt : pointer_decl "=" _ expr
-
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
-
-  expr          go to state 103
-  function_call  go to state 56
-  array_ref     go to state 65
-  pointer_decl  go to state 66
-
 state 78
 
-  41) simple_stmt : lval "=" _ expr
-  48) simple_stmt : lval "=" _ "&" expr
+  48) simple_stmt : pointer_decl "=" _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  "&"           shift, and go to state 105
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  expr          go to state 104
-  function_call  go to state 56
-  array_ref     go to state 65
-  pointer_decl  go to state 66
+  expr          go to state 105
+  function_call  go to state 57
+  array_ref     go to state 66
+  pointer_decl  go to state 67
 
 state 79
 
-  45) simple_stmt : RETURN expr _
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  41) stmt : PRAGMA OMP _ PARALLEL "{" stmt_list "}"
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 45 (simple_stmt)
+  PARALLEL      shift, and go to state 106
 
 
 state 80
 
-  64) expr : expr "+" _ expr
+  42) simple_stmt : lval "=" _ expr
+  49) simple_stmt : lval "=" _ "&" expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  "&"           shift, and go to state 108
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 106
-  pointer_decl  go to state 66
+  expr          go to state 107
+  function_call  go to state 57
+  array_ref     go to state 66
+  pointer_decl  go to state 67
 
 state 81
 
-  65) expr : expr "-" _ expr
+  46) simple_stmt : RETURN expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 46 (simple_stmt)
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 107
-  pointer_decl  go to state 66
 
 state 82
 
-  66) expr : expr "*" _ expr
+  65) expr : expr "+" _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 108
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 109
+  pointer_decl  go to state 67
 
 state 83
 
-  67) expr : expr "/" _ expr
+  66) expr : expr "-" _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 109
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 110
+  pointer_decl  go to state 67
 
 state 84
 
-  68) expr : expr BOOL_OP _ expr
+  67) expr : expr "*" _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 110
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 111
+  pointer_decl  go to state 67
 
 state 85
 
-  69) expr : expr REL_OP _ expr
+  68) expr : expr "/" _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 111
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 112
+  pointer_decl  go to state 67
 
 state 86
 
-  49) compound_stmt : FOR "(" _ simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}"
+  69) expr : expr BOOL_OP _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 114
-  "("           shift, and go to state 60
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  lval          go to state 44
-  expr          go to state 48
-  pointer_decl  go to state 112
-  simple_stmt   go to state 113
-  array_ref     go to state 52
-  function_call  go to state 56
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 113
+  pointer_decl  go to state 67
 
 state 87
 
-  50) compound_stmt : WHILE "(" _ simple_stmt ")" block
+  70) expr : expr REL_OP _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 114
-  "("           shift, and go to state 60
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  lval          go to state 44
-  expr          go to state 48
-  pointer_decl  go to state 112
-  simple_stmt   go to state 115
-  array_ref     go to state 52
-  function_call  go to state 56
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 114
+  pointer_decl  go to state 67
 
 state 88
 
-  51) compound_stmt : IF "(" _ simple_stmt ")" block optional_else
+  50) compound_stmt : FOR "(" _ simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 114
-  "("           shift, and go to state 60
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 117
+  "("           shift, and go to state 61
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  lval          go to state 44
-  expr          go to state 48
-  pointer_decl  go to state 112
+  lval          go to state 45
+  expr          go to state 49
+  pointer_decl  go to state 115
   simple_stmt   go to state 116
-  array_ref     go to state 52
-  function_call  go to state 56
+  array_ref     go to state 53
+  function_call  go to state 57
 
 state 89
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  70) expr : "-" expr _
+  51) compound_stmt : WHILE "(" _ simple_stmt ")" block
 
-  $default      reduce using rule 70 (expr)
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 117
+  "("           shift, and go to state 61
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
+  lval          go to state 45
+  expr          go to state 49
+  pointer_decl  go to state 115
+  simple_stmt   go to state 118
+  array_ref     go to state 53
+  function_call  go to state 57
 
 state 90
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  71) expr : "+" expr _
+  52) compound_stmt : IF "(" _ simple_stmt ")" block optional_else
+
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 117
+  "("           shift, and go to state 61
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+
+  lval          go to state 45
+  expr          go to state 49
+  pointer_decl  go to state 115
+  simple_stmt   go to state 119
+  array_ref     go to state 53
+  function_call  go to state 57
+
+state 91
+
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  71) expr : "-" expr _
 
   $default      reduce using rule 71 (expr)
 
 
-state 91
+state 92
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  72) expr : PREFIX_OP expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  72) expr : "+" expr _
 
   $default      reduce using rule 72 (expr)
 
 
-state 92
-
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  73) expr : "(" expr _ ")"
-
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  ")"           shift, and go to state 117
-
-
 state 93
+
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  73) expr : PREFIX_OP expr _
+
+  $default      reduce using rule 73 (expr)
+
+
+state 94
+
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  74) expr : "(" expr _ ")"
+
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  ")"           shift, and go to state 120
+
+
+state 95
 
   30) array_formal_sub : "[" expr "]" _
 
   $default      reduce using rule 30 (array_formal_sub)
 
 
-state 94
+state 96
 
-  78) function_call : IDENTIFIER "(" _ actual_params ")"
-  79) function_call : IDENTIFIER "(" _ ")"
+  79) function_call : IDENTIFIER "(" _ actual_params ")"
+  80) function_call : IDENTIFIER "(" _ ")"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  ")"           shift, and go to state 118
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  ")"           shift, and go to state 121
+  ")"           [reduce using rule 83 (actual_params)]
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+  $default      reduce using rule 83 (actual_params)
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 99
-  pointer_decl  go to state 66
-  actual_params  go to state 100
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 101
+  pointer_decl  go to state 67
+  actual_params  go to state 102
 
-state 95
+state 97
 
   21) type_decl : typename decl_list ";" _
 
   $default      reduce using rule 21 (type_decl)
 
 
-state 96
+state 98
 
   22) decl_list : decl_list "," _ lval
 
   "*"           shift, and go to state 26
-  IDENTIFIER    shift, and go to state 69
+  IDENTIFIER    shift, and go to state 70
 
-  lval          go to state 119
-  array_ref     go to state 70
-  pointer_decl  go to state 71
+  lval          go to state 122
+  array_ref     go to state 71
+  pointer_decl  go to state 72
 
-state 97
+state 99
 
    9) formal_params : formal_params _ "," formal_param
   26) fn_decl : IDENTIFIER "(" formal_params _ ")"
 
-  ")"           shift, and go to state 120
+  ")"           shift, and go to state 123
   ","           shift, and go to state 21
-
-
-state 98
-
-  25) fn_decl : IDENTIFIER "(" ")" _
-  79) function_call : IDENTIFIER "(" ")" _
-
-  "/"           reduce using rule 79 (function_call)
-  BOOL_OP       reduce using rule 79 (function_call)
-  REL_OP        reduce using rule 79 (function_call)
-  ";"           reduce using rule 79 (function_call)
-  "*"           [reduce using rule 79 (function_call)]
-  "+"           [reduce using rule 79 (function_call)]
-  "-"           [reduce using rule 79 (function_call)]
-  $default      reduce using rule 25 (fn_decl)
-
-
-state 99
-
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  81) actual_params : expr _
-
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 81 (actual_params)
 
 
 state 100
 
-  78) function_call : IDENTIFIER "(" actual_params _ ")"
-  80) actual_params : actual_params _ "," expr
+  25) fn_decl : IDENTIFIER "(" ")" _
+  80) function_call : IDENTIFIER "(" ")" _
 
-  ")"           shift, and go to state 121
-  ","           shift, and go to state 122
+  "/"           reduce using rule 80 (function_call)
+  BOOL_OP       reduce using rule 80 (function_call)
+  REL_OP        reduce using rule 80 (function_call)
+  ";"           reduce using rule 80 (function_call)
+  "*"           [reduce using rule 80 (function_call)]
+  "+"           [reduce using rule 80 (function_call)]
+  "-"           [reduce using rule 80 (function_call)]
+  $default      reduce using rule 25 (fn_decl)
 
 
 state 101
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  77) array_index_list : expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  82) actual_params : expr _
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 77 (array_index_list)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 82 (actual_params)
 
 
 state 102
 
-  75) array_ref : IDENTIFIER "[" array_index_list _ "]"
-  76) array_index_list : array_index_list _ "]" "[" expr
+  79) function_call : IDENTIFIER "(" actual_params _ ")"
+  81) actual_params : actual_params _ "," expr
 
-  "]"           shift, and go to state 123
+  ")"           shift, and go to state 124
+  ","           shift, and go to state 125
 
 
 state 103
 
-  47) simple_stmt : pointer_decl "=" expr _
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  78) array_index_list : expr _
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 47 (simple_stmt)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 78 (array_index_list)
 
 
 state 104
 
-  41) simple_stmt : lval "=" expr _
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  76) array_ref : IDENTIFIER "[" array_index_list _ "]"
+  77) array_index_list : array_index_list _ "]" "[" expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 41 (simple_stmt)
+  "]"           shift, and go to state 126
 
 
 state 105
 
-  48) simple_stmt : lval "=" "&" _ expr
+  48) simple_stmt : pointer_decl "=" expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 48 (simple_stmt)
 
-  expr          go to state 124
-  function_call  go to state 56
-  array_ref     go to state 65
-  pointer_decl  go to state 66
 
 state 106
 
-  64) expr : expr _ "+" expr
-  64) expr : expr "+" expr _
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  41) stmt : PRAGMA OMP PARALLEL _ "{" stmt_list "}"
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  $default      reduce using rule 64 (expr)
+  "{"           shift, and go to state 127
 
 
 state 107
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  65) expr : expr "-" expr _
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  42) simple_stmt : lval "=" expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  $default      reduce using rule 65 (expr)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 42 (simple_stmt)
 
 
 state 108
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  66) expr : expr "*" expr _
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  49) simple_stmt : lval "=" "&" _ expr
 
-  $default      reduce using rule 66 (expr)
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
+  expr          go to state 128
+  function_call  go to state 57
+  array_ref     go to state 66
+  pointer_decl  go to state 67
 
 state 109
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  67) expr : expr "/" expr _
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  65) expr : expr _ "+" expr
+  65) expr : expr "+" expr _
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  $default      reduce using rule 67 (expr)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  $default      reduce using rule 65 (expr)
 
 
 state 110
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  68) expr : expr BOOL_OP expr _
-  69) expr : expr _ REL_OP expr
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  66) expr : expr "-" expr _
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  $default      reduce using rule 68 (expr)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  $default      reduce using rule 66 (expr)
 
 
 state 111
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  69) expr : expr REL_OP expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  67) expr : expr "*" expr _
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  $default      reduce using rule 69 (expr)
+  $default      reduce using rule 67 (expr)
 
 
 state 112
 
-  47) simple_stmt : pointer_decl _ "=" expr
-  57) lval : pointer_decl _
-  74) expr : pointer_decl _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  68) expr : expr "/" expr _
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "="           shift, and go to state 77
-  "="           [reduce using rule 57 (lval)]
-  $default      reduce using rule 74 (expr)
+  $default      reduce using rule 68 (expr)
 
 
 state 113
 
-  49) compound_stmt : FOR "(" simple_stmt _ ";" expr ";" simple_stmt ")" "{" stmt_list "}"
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  69) expr : expr BOOL_OP expr _
+  70) expr : expr _ REL_OP expr
 
-  ";"           shift, and go to state 125
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  $default      reduce using rule 69 (expr)
 
 
 state 114
 
-  55) lval : IDENTIFIER _
-  58) expr : IDENTIFIER _
-  75) array_ref : IDENTIFIER _ "[" array_index_list "]"
-  78) function_call : IDENTIFIER _ "(" actual_params ")"
-  79) function_call : IDENTIFIER _ "(" ")"
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  70) expr : expr REL_OP expr _
 
-  "("           shift, and go to state 94
-  "["           shift, and go to state 73
-  "="           reduce using rule 55 (lval)
-  $default      reduce using rule 58 (expr)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  $default      reduce using rule 70 (expr)
 
 
 state 115
 
-  50) compound_stmt : WHILE "(" simple_stmt _ ")" block
+  48) simple_stmt : pointer_decl _ "=" expr
+  58) lval : pointer_decl _
+  75) expr : pointer_decl _
 
-  ")"           shift, and go to state 126
+  "="           shift, and go to state 78
+  "="           [reduce using rule 58 (lval)]
+  $default      reduce using rule 75 (expr)
 
 
 state 116
 
-  51) compound_stmt : IF "(" simple_stmt _ ")" block optional_else
+  50) compound_stmt : FOR "(" simple_stmt _ ";" expr ";" simple_stmt ")" "{" stmt_list "}"
 
-  ")"           shift, and go to state 127
+  ";"           shift, and go to state 129
 
 
 state 117
 
-  73) expr : "(" expr ")" _
+  56) lval : IDENTIFIER _
+  59) expr : IDENTIFIER _
+  76) array_ref : IDENTIFIER _ "[" array_index_list "]"
+  79) function_call : IDENTIFIER _ "(" actual_params ")"
+  80) function_call : IDENTIFIER _ "(" ")"
 
-  $default      reduce using rule 73 (expr)
+  "("           shift, and go to state 96
+  "["           shift, and go to state 74
+  "="           reduce using rule 56 (lval)
+  $default      reduce using rule 59 (expr)
 
 
 state 118
 
-  79) function_call : IDENTIFIER "(" ")" _
+  51) compound_stmt : WHILE "(" simple_stmt _ ")" block
 
-  $default      reduce using rule 79 (function_call)
+  ")"           shift, and go to state 130
 
 
 state 119
+
+  52) compound_stmt : IF "(" simple_stmt _ ")" block optional_else
+
+  ")"           shift, and go to state 131
+
+
+state 120
+
+  74) expr : "(" expr ")" _
+
+  $default      reduce using rule 74 (expr)
+
+
+state 121
+
+  80) function_call : IDENTIFIER "(" ")" _
+
+  $default      reduce using rule 80 (function_call)
+
+
+state 122
 
   22) decl_list : decl_list "," lval _
 
   $default      reduce using rule 22 (decl_list)
 
 
-state 120
+state 123
 
   26) fn_decl : IDENTIFIER "(" formal_params ")" _
 
   $default      reduce using rule 26 (fn_decl)
 
 
-state 121
-
-  78) function_call : IDENTIFIER "(" actual_params ")" _
-
-  $default      reduce using rule 78 (function_call)
-
-
-state 122
-
-  80) actual_params : actual_params "," _ expr
-
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
-
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 128
-  pointer_decl  go to state 66
-
-state 123
-
-  75) array_ref : IDENTIFIER "[" array_index_list "]" _
-  76) array_index_list : array_index_list "]" _ "[" expr
-
-  "["           shift, and go to state 129
-  $default      reduce using rule 75 (array_ref)
-
-
 state 124
 
-  48) simple_stmt : lval "=" "&" expr _
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  79) function_call : IDENTIFIER "(" actual_params ")" _
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 48 (simple_stmt)
+  $default      reduce using rule 79 (function_call)
 
 
 state 125
 
-  49) compound_stmt : FOR "(" simple_stmt ";" _ expr ";" simple_stmt ")" "{" stmt_list "}"
+  81) actual_params : actual_params "," _ expr
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  expr          go to state 130
-  function_call  go to state 56
-  array_ref     go to state 65
-  pointer_decl  go to state 66
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 132
+  pointer_decl  go to state 67
 
 state 126
 
-  50) compound_stmt : WHILE "(" simple_stmt ")" _ block
+  76) array_ref : IDENTIFIER "[" array_index_list "]" _
+  77) array_index_list : array_index_list "]" _ "[" expr
 
-  "{"           shift, and go to state 28
-  $default      reduce using rule 33 (block)
+  "["           shift, and go to state 133
+  $default      reduce using rule 76 (array_ref)
 
-  block         go to state 131
 
 state 127
 
-  51) compound_stmt : IF "(" simple_stmt ")" _ block optional_else
+  41) stmt : PRAGMA OMP PARALLEL "{" _ stmt_list "}"
 
-  "{"           shift, and go to state 28
-  $default      reduce using rule 33 (block)
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 36
+  "("           shift, and go to state 61
+  CHAR          shift, and go to state 7
+  INT           shift, and go to state 8
+  DOUBLE        shift, and go to state 9
+  VOID          shift, and go to state 10
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  block         go to state 132
+  typename      go to state 35
+  stmt_list     go to state 134
+  stmt          go to state 38
+  simple_stmt   go to state 39
+  compound_stmt  go to state 40
+  type_decl     go to state 41
+  pointer_decl  go to state 42
+  fn_decl       go to state 43
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
 
 state 128
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  80) actual_params : actual_params "," expr _
+  49) simple_stmt : lval "=" "&" expr _
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 80 (actual_params)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 49 (simple_stmt)
 
 
 state 129
 
-  76) array_index_list : array_index_list "]" "[" _ expr
+  50) compound_stmt : FOR "(" simple_stmt ";" _ expr ";" simple_stmt ")" "{" stmt_list "}"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 64
-  "("           shift, and go to state 60
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  function_call  go to state 56
-  array_ref     go to state 65
-  expr          go to state 133
-  pointer_decl  go to state 66
+  expr          go to state 135
+  function_call  go to state 57
+  array_ref     go to state 66
+  pointer_decl  go to state 67
 
 state 130
 
-  49) compound_stmt : FOR "(" simple_stmt ";" expr _ ";" simple_stmt ")" "{" stmt_list "}"
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
+  51) compound_stmt : WHILE "(" simple_stmt ")" _ block
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  ";"           shift, and go to state 134
+  "{"           shift, and go to state 28
+  $default      reduce using rule 33 (block)
 
+  block         go to state 136
 
 state 131
 
-  50) compound_stmt : WHILE "(" simple_stmt ")" block _
+  52) compound_stmt : IF "(" simple_stmt ")" _ block optional_else
 
-  $default      reduce using rule 50 (compound_stmt)
+  "{"           shift, and go to state 28
+  $default      reduce using rule 33 (block)
 
+  block         go to state 137
 
 state 132
 
-  51) compound_stmt : IF "(" simple_stmt ")" block _ optional_else
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  81) actual_params : actual_params "," expr _
 
-  ELSE          shift, and go to state 136
-  $default      reduce using rule 52 (optional_else)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 81 (actual_params)
 
-  optional_else  go to state 135
 
 state 133
 
-  64) expr : expr _ "+" expr
-  65) expr : expr _ "-" expr
-  66) expr : expr _ "*" expr
-  67) expr : expr _ "/" expr
-  68) expr : expr _ BOOL_OP expr
-  69) expr : expr _ REL_OP expr
-  76) array_index_list : array_index_list "]" "[" expr _
+  77) array_index_list : array_index_list "]" "[" _ expr
 
-  "*"           shift, and go to state 82
-  "/"           shift, and go to state 83
-  "+"           shift, and go to state 80
-  "-"           shift, and go to state 81
-  BOOL_OP       shift, and go to state 84
-  REL_OP        shift, and go to state 85
-  $default      reduce using rule 76 (array_index_list)
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 65
+  "("           shift, and go to state 61
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
+  function_call  go to state 57
+  array_ref     go to state 66
+  expr          go to state 138
+  pointer_decl  go to state 67
 
 state 134
 
-  49) compound_stmt : FOR "(" simple_stmt ";" expr ";" _ simple_stmt ")" "{" stmt_list "}"
+  34) stmt_list : stmt_list _ stmt
+  41) stmt : PRAGMA OMP PARALLEL "{" stmt_list _ "}"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 114
-  "("           shift, and go to state 60
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 36
+  "("           shift, and go to state 61
+  CHAR          shift, and go to state 7
+  INT           shift, and go to state 8
+  DOUBLE        shift, and go to state 9
+  VOID          shift, and go to state 10
+  "}"           shift, and go to state 139
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  lval          go to state 44
-  expr          go to state 48
-  pointer_decl  go to state 112
-  simple_stmt   go to state 137
-  array_ref     go to state 52
-  function_call  go to state 56
+  typename      go to state 35
+  stmt          go to state 76
+  simple_stmt   go to state 39
+  compound_stmt  go to state 40
+  type_decl     go to state 41
+  pointer_decl  go to state 42
+  fn_decl       go to state 43
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
 
 state 135
 
-  51) compound_stmt : IF "(" simple_stmt ")" block optional_else _
+  50) compound_stmt : FOR "(" simple_stmt ";" expr _ ";" simple_stmt ")" "{" stmt_list "}"
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
 
-  $default      reduce using rule 51 (compound_stmt)
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  ";"           shift, and go to state 140
 
 
 state 136
 
-  53) optional_else : ELSE _
-  54) optional_else : ELSE _ "{" stmt_list "}"
+  51) compound_stmt : WHILE "(" simple_stmt ")" block _
 
-  "{"           shift, and go to state 138
-  $default      reduce using rule 53 (optional_else)
+  $default      reduce using rule 51 (compound_stmt)
 
 
 state 137
 
-  49) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt _ ")" "{" stmt_list "}"
+  52) compound_stmt : IF "(" simple_stmt ")" block _ optional_else
 
-  ")"           shift, and go to state 139
+  ELSE          shift, and go to state 142
+  $default      reduce using rule 53 (optional_else)
 
+  optional_else  go to state 141
 
 state 138
 
-  54) optional_else : ELSE "{" _ stmt_list "}"
+  65) expr : expr _ "+" expr
+  66) expr : expr _ "-" expr
+  67) expr : expr _ "*" expr
+  68) expr : expr _ "/" expr
+  69) expr : expr _ BOOL_OP expr
+  70) expr : expr _ REL_OP expr
+  77) array_index_list : array_index_list "]" "[" expr _
 
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 36
-  "("           shift, and go to state 60
-  CHAR          shift, and go to state 7
-  INT           shift, and go to state 8
-  DOUBLE        shift, and go to state 9
-  VOID          shift, and go to state 10
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  FOR           shift, and go to state 49
-  WHILE         shift, and go to state 50
-  IF            shift, and go to state 51
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "*"           shift, and go to state 84
+  "/"           shift, and go to state 85
+  "+"           shift, and go to state 82
+  "-"           shift, and go to state 83
+  BOOL_OP       shift, and go to state 86
+  REL_OP        shift, and go to state 87
+  $default      reduce using rule 77 (array_index_list)
 
-  typename      go to state 35
-  stmt_list     go to state 140
-  stmt          go to state 38
-  simple_stmt   go to state 39
-  compound_stmt  go to state 40
-  type_decl     go to state 41
-  pointer_decl  go to state 42
-  fn_decl       go to state 43
-  lval          go to state 44
-  expr          go to state 48
-  array_ref     go to state 52
-  function_call  go to state 56
 
 state 139
 
-  49) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" _ "{" stmt_list "}"
+  41) stmt : PRAGMA OMP PARALLEL "{" stmt_list "}" _
 
-  "{"           shift, and go to state 141
+  $default      reduce using rule 41 (stmt)
 
 
 state 140
 
-  34) stmt_list : stmt_list _ stmt
-  54) optional_else : ELSE "{" stmt_list _ "}"
+  50) compound_stmt : FOR "(" simple_stmt ";" expr ";" _ simple_stmt ")" "{" stmt_list "}"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 36
-  "("           shift, and go to state 60
-  CHAR          shift, and go to state 7
-  INT           shift, and go to state 8
-  DOUBLE        shift, and go to state 9
-  VOID          shift, and go to state 10
-  "}"           shift, and go to state 142
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  FOR           shift, and go to state 49
-  WHILE         shift, and go to state 50
-  IF            shift, and go to state 51
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 117
+  "("           shift, and go to state 61
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
-  typename      go to state 35
-  stmt          go to state 75
-  simple_stmt   go to state 39
-  compound_stmt  go to state 40
-  type_decl     go to state 41
-  pointer_decl  go to state 42
-  fn_decl       go to state 43
-  lval          go to state 44
-  expr          go to state 48
-  array_ref     go to state 52
-  function_call  go to state 56
+  lval          go to state 45
+  expr          go to state 49
+  pointer_decl  go to state 115
+  simple_stmt   go to state 143
+  array_ref     go to state 53
+  function_call  go to state 57
 
 state 141
 
-  49) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" _ stmt_list "}"
+  52) compound_stmt : IF "(" simple_stmt ")" block optional_else _
 
-  "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
-  IDENTIFIER    shift, and go to state 36
-  "("           shift, and go to state 60
-  CHAR          shift, and go to state 7
-  INT           shift, and go to state 8
-  DOUBLE        shift, and go to state 9
-  VOID          shift, and go to state 10
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  FOR           shift, and go to state 49
-  WHILE         shift, and go to state 50
-  IF            shift, and go to state 51
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  $default      reduce using rule 52 (compound_stmt)
 
-  typename      go to state 35
-  stmt_list     go to state 143
-  stmt          go to state 38
-  simple_stmt   go to state 39
-  compound_stmt  go to state 40
-  type_decl     go to state 41
-  pointer_decl  go to state 42
-  fn_decl       go to state 43
-  lval          go to state 44
-  expr          go to state 48
-  array_ref     go to state 52
-  function_call  go to state 56
 
 state 142
 
-  54) optional_else : ELSE "{" stmt_list "}" _
+  54) optional_else : ELSE _
+  55) optional_else : ELSE _ "{" stmt_list "}"
 
+  "{"           shift, and go to state 144
   $default      reduce using rule 54 (optional_else)
 
 
 state 143
 
-  34) stmt_list : stmt_list _ stmt
-  49) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list _ "}"
+  50) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt _ ")" "{" stmt_list "}"
+
+  ")"           shift, and go to state 145
+
+
+state 144
+
+  55) optional_else : ELSE "{" _ stmt_list "}"
 
   "*"           shift, and go to state 26
-  "+"           shift, and go to state 58
-  "-"           shift, and go to state 57
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
   IDENTIFIER    shift, and go to state 36
-  "("           shift, and go to state 60
+  "("           shift, and go to state 61
   CHAR          shift, and go to state 7
   INT           shift, and go to state 8
   DOUBLE        shift, and go to state 9
   VOID          shift, and go to state 10
-  "}"           shift, and go to state 144
-  BREAK         shift, and go to state 45
-  CONTINUE      shift, and go to state 46
-  RETURN        shift, and go to state 47
-  FOR           shift, and go to state 49
-  WHILE         shift, and go to state 50
-  IF            shift, and go to state 51
-  INT_NUM       shift, and go to state 53
-  REAL_NUM      shift, and go to state 54
-  STRING        shift, and go to state 55
-  PREFIX_OP     shift, and go to state 59
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
 
   typename      go to state 35
-  stmt          go to state 75
+  stmt_list     go to state 146
+  stmt          go to state 38
   simple_stmt   go to state 39
   compound_stmt  go to state 40
   type_decl     go to state 41
   pointer_decl  go to state 42
   fn_decl       go to state 43
-  lval          go to state 44
-  expr          go to state 48
-  array_ref     go to state 52
-  function_call  go to state 56
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
 
-state 144
+state 145
 
-  49) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}" _
+  50) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" _ "{" stmt_list "}"
 
-  $default      reduce using rule 49 (compound_stmt)
+  "{"           shift, and go to state 147
+
+
+state 146
+
+  34) stmt_list : stmt_list _ stmt
+  55) optional_else : ELSE "{" stmt_list _ "}"
+
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 36
+  "("           shift, and go to state 61
+  CHAR          shift, and go to state 7
+  INT           shift, and go to state 8
+  DOUBLE        shift, and go to state 9
+  VOID          shift, and go to state 10
+  "}"           shift, and go to state 148
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+
+  typename      go to state 35
+  stmt          go to state 76
+  simple_stmt   go to state 39
+  compound_stmt  go to state 40
+  type_decl     go to state 41
+  pointer_decl  go to state 42
+  fn_decl       go to state 43
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
+
+state 147
+
+  50) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" _ stmt_list "}"
+
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 36
+  "("           shift, and go to state 61
+  CHAR          shift, and go to state 7
+  INT           shift, and go to state 8
+  DOUBLE        shift, and go to state 9
+  VOID          shift, and go to state 10
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+
+  typename      go to state 35
+  stmt_list     go to state 149
+  stmt          go to state 38
+  simple_stmt   go to state 39
+  compound_stmt  go to state 40
+  type_decl     go to state 41
+  pointer_decl  go to state 42
+  fn_decl       go to state 43
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
+
+state 148
+
+  55) optional_else : ELSE "{" stmt_list "}" _
+
+  $default      reduce using rule 55 (optional_else)
+
+
+state 149
+
+  34) stmt_list : stmt_list _ stmt
+  50) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list _ "}"
+
+  "*"           shift, and go to state 26
+  "+"           shift, and go to state 59
+  "-"           shift, and go to state 58
+  IDENTIFIER    shift, and go to state 36
+  "("           shift, and go to state 61
+  CHAR          shift, and go to state 7
+  INT           shift, and go to state 8
+  DOUBLE        shift, and go to state 9
+  VOID          shift, and go to state 10
+  "}"           shift, and go to state 150
+  PRAGMA        shift, and go to state 44
+  BREAK         shift, and go to state 46
+  CONTINUE      shift, and go to state 47
+  RETURN        shift, and go to state 48
+  FOR           shift, and go to state 50
+  WHILE         shift, and go to state 51
+  IF            shift, and go to state 52
+  INT_NUM       shift, and go to state 54
+  REAL_NUM      shift, and go to state 55
+  STRING        shift, and go to state 56
+  PREFIX_OP     shift, and go to state 60
+
+  typename      go to state 35
+  stmt          go to state 76
+  simple_stmt   go to state 39
+  compound_stmt  go to state 40
+  type_decl     go to state 41
+  pointer_decl  go to state 42
+  fn_decl       go to state 43
+  lval          go to state 45
+  expr          go to state 49
+  array_ref     go to state 53
+  function_call  go to state 57
+
+state 150
+
+  50) compound_stmt : FOR "(" simple_stmt ";" expr ";" simple_stmt ")" "{" stmt_list "}" _
+
+  $default      reduce using rule 50 (compound_stmt)
 

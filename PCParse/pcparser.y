@@ -50,7 +50,7 @@ function_def:
   | typename '&' IDENTIFIER  { result = val[0] , val[2] }
   | typename array_formal  { result = val[0] , val[1] }
   | typename pointer_decl  { result = val[0] , val[1] }
-  | { result = [] }
+  | { result =  ' '  } /*empty formal params */
   ;
  
    typename:
@@ -62,12 +62,12 @@ function_def:
  
   /*Rule defining a declaration with a type and a list of one or more variables/functions */
     type_decl:
-    typename decl_list ';'{ result = [val[0],val[1]] }
+   typename decl_list ';'{ result = :TypeDecls[val[0],val[1]] }
     ;
  
   /* Rule defining single declaration or a list of declarations */
     decl_list:
-    decl_list ',' lval { result = val[0] + ' ' + val[2]  }
+    decl_list ',' lval { result = val[0] + val[1] + val[2]   }
  /*| expr     Putting decl here gives rise to reduce/reduce conflicts */ 
    | lval
    ;
@@ -119,7 +119,9 @@ function_def:
   | type_decl { result = val[0] }
   | pointer_decl {result = val[0] }
   | fn_decl
+  | PRAGMA OMP PARALLEL '{' stmt_list  '}' { result = :parallelPragmaBlock[val[4]] } 
   ;
+
 
 /*Added rule for statements with pointer assignments */
     simple_stmt:
@@ -139,7 +141,8 @@ function_def:
   | WHILE '(' simple_stmt ')' block  { result = [val[0],val[2],val[4]] }
   | IF '(' simple_stmt ')' block  optional_else  { result = :IfStmt[val[2] ,val[4] ,val[5]] }
   ;
-  
+   
+
  /*Rules for optional else */
    optional_else:
     { result = [] }
@@ -186,12 +189,13 @@ expr:
 
   function_call:
     IDENTIFIER '(' actual_params ')'  { result = :FunctionCall[val[0],val[2]] }
-  | IDENTIFIER '(' ')'  { result =   val[0] }
+  | IDENTIFIER '(' ')'  { result =   val[0]+val[1]+val[2] }
   ;
 
   actual_params:
      actual_params ',' expr { result = val[0] + [val[2]] } 
    | expr { result = [val[0]] } 
+   | {  } /*For empty params*/
    ;
 
 end
