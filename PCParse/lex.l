@@ -165,7 +165,7 @@ parallel {
 "."	{ return '.'; }
 ","	{ return ','; }
 "\""	{ return '"'; }
-
+"#"     { return '#'; }
 
 %{
   /* Real numbers.  Don't grab the `.' part of a dot operator as part of the
