@@ -45,13 +45,16 @@ def pragma_codegen(s)
    #puts index
    pragma_block = block_child.delete(i)
    #pth = Array.new
-   #a = Array.new
+   #stmts = Array.new
    #stmt_0 = 'pthread_t threads[NUM_THREADS];'
    #a.push(stmt_0)
    #pth.push(stmt_0)
-   #stmts = generate_block_to_insert_in_main()
-   #s = stmts.flatten
-   block_child.insert(index,"a")
+   stmts = generate_block_to_insert_in_main()
+   #puts stmts
+   #flat = stmts.flatten
+   #puts flat
+   block_child.insert(index,stmts)
+   #end
    #puts block_child
    end
   end 
@@ -63,12 +66,12 @@ def  generate_block_to_insert_in_main()
     
   #stmt_1 = [:TypeDecls["int", :ArrayRef["thread_args",:ConsInt ["10"]]]]
   stmt_list = Array.new
+  stmt_0 = :TypeDecls["pthread_t",:ArrayRef["threads",:Variable["NUM_THREADS"]]]
   stmt_2 =  :TypeDecls["int","rc ,i"]
-  stmt_0 = 'pthread_t threads[NUM_THREADS]'
+  stmt_1 =  :TypeDecls["int",:ArrayRef["thread_args",:Variable["NUM_THREADS"]]]
   #stmt_list.push(stmt_0)
-  stmt_list.push(stmt_0)
-  #init_stmts.push(stmt_2)
-  return stmt_list
+  stmt_list.push(stmt_2)
+  return stmt_0
   #init_stmts.each do |i|
   #puts i
   #end
@@ -530,8 +533,8 @@ class UnparsePidginC
       rule :PointerAssignment do |p_var|
         v({}, p_var)
       end
-      rule :TypeDecl do |name ,t_var |
-        h({},*t_var.children)
+      rule :TypeDecl do |t_var |
+        h({},' ' , *t_var)
       end
       rule :FunctionCall do |func_call ,args|
         h({}, *func_call ,"(" ,
