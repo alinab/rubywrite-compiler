@@ -30,31 +30,19 @@ end
 
 def pragma_codegen(s)
   node = return_node(s)
-  #puts node
   block_name = return_node(node)
-  #puts block_name
   block_child = return_node(block_name)
-  #puts block_child.flatten
   block_child.each do |i|
   g = i.value
   if g.eql?(:ParallelPragmaBlock)
-   #print g,"--<\n"
-   #pragma_block = i
-   #generate_pragma_c_code(pragma_block)
    index = block_child.index(i)
-   #puts index
    pragma_block = block_child.delete(i)
-   #pth = Array.new
-   #stmts = Array.new
-   #stmt_0 = 'pthread_t threads[NUM_THREADS];'
-   #a.push(stmt_0)
-   #pth.push(stmt_0)
    stmts = generate_block_to_insert_in_main()
-   #puts stmts
-   #flat = stmts.flatten
-   #puts flat
-   block_child.insert(index,stmts)
-   #end
+   point = index
+   stmts.each do |i|
+    block_child.insert(point,i)
+    point = point + 1
+   end
    #puts block_child
    end
   end 
@@ -63,18 +51,38 @@ end
 
 
 def  generate_block_to_insert_in_main()
-    
-  #stmt_1 = [:TypeDecls["int", :ArrayRef["thread_args",:ConsInt ["10"]]]]
   stmt_list = Array.new
   stmt_0 = :TypeDecls["pthread_t",:ArrayRef["threads",:Variable["NUM_THREADS"]]]
   stmt_2 =  :TypeDecls["int","rc ,i"]
   stmt_1 =  :TypeDecls["int",:ArrayRef["thread_args",:Variable["NUM_THREADS"]]]
-  #stmt_list.push(stmt_0)
+  stmt_list.push(stmt_0)
+  stmt_list.push(stmt_1)
   stmt_list.push(stmt_2)
-  return stmt_0
-  #init_stmts.each do |i|
-  #puts i
-  #end
+
+
+  for_array_stmts = Array.new
+  for_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]]\
+                  ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
+                :Variable["NUM_THREADS"  ] ]  \
+              ,:Assignment["i" \
+           ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
+             ,:ConstInt[  "1"  ] ]],for_array_stmts ]
+
+
+  for_stmt_1 = :Assignment[ :ArrayRef[\
+               "thread_args" ,:Variable[ "i"  ] ] \
+            , :Variable[ "i"  ] ]
+   for_stmt_2 = :FunctionCall[ \
+             "printf"  ,[:ConstString[ "\"Im main:creating thread %d\\n\""  ] \
+             ,:Variable[   "i"  ] ]]
+
+  for_array_stmts.push(for_stmt_1)
+  for_array_stmts.push(for_stmt_2)
+           
+
+  stmt_list.push(for_stmt)
+  return stmt_list
+
 end
  
 def return_node(n)
@@ -476,10 +484,10 @@ class UnparsePidginC
       rule :UnaryOp do |op, rand|
         h({}, op, rand)
       end
-      rule :ForStmt do |stmt ,expr, stmts|
+      rule :For do |init ,cond1,cond2,cond3, stmts|
         v({},
-          v({:is => 2}, h({:hs => 1}, "for",stmt,expr), stmts),
-            "end")
+          v({:is => 2}, h({:hs => 1},init,'(',cond1,cond2,';',cond3 ,')'),'{',
+            v({} ,*stmts),'}'))
       end
       rule :WhileStmt do |expr, stmts|
         v({},
