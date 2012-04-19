@@ -10,6 +10,7 @@ require 'llvm/core'
 require 'llvm/execution_engine'
 require 'llvm/transforms/scalar'
 
+STDOUT.sync = true
 
 def parsed_output()
     parser = PCParser.new
@@ -18,14 +19,82 @@ def parsed_output()
     puts
 end
 
-def unparse()
+def new_unparse()
     parser = PCParser.new
-    tt = parser.parse_file
+    s = parser.parse_file
+    tt = pragma_codegen(s)
     a = UnparsePidginC.new
     result = a.unparse(tt)
-    puts result
+    print result 
 end
 
+def pragma_codegen(s)
+  node = return_node(s)
+  #puts node
+  block_name = return_node(node)
+  #puts block_name
+  block_child = return_node(block_name)
+  #puts block_child.flatten
+  block_child.each do |i|
+  g = i.value
+  if g.eql?(:ParallelPragmaBlock)
+   #print g,"--<\n"
+   #pragma_block = i
+   #generate_pragma_c_code(pragma_block)
+   index = block_child.index(i)
+   #puts index
+   pragma_block = block_child.delete(i)
+   #pth = Array.new
+   #a = Array.new
+   #stmt_0 = 'pthread_t threads[NUM_THREADS];'
+   #a.push(stmt_0)
+   #pth.push(stmt_0)
+   #stmts = generate_block_to_insert_in_main()
+   #s = stmts.flatten
+   block_child.insert(index,"a")
+   #puts block_child
+   end
+  end 
+return s
+end
+
+
+def  generate_block_to_insert_in_main()
+    
+  #stmt_1 = [:TypeDecls["int", :ArrayRef["thread_args",:ConsInt ["10"]]]]
+  stmt_list = Array.new
+  stmt_2 =  :TypeDecls["int","rc ,i"]
+  stmt_0 = 'pthread_t threads[NUM_THREADS]'
+  #stmt_list.push(stmt_0)
+  stmt_list.push(stmt_0)
+  #init_stmts.push(stmt_2)
+  return stmt_list
+  #init_stmts.each do |i|
+  #puts i
+  #end
+end
+ 
+def return_node(n)
+  nodeName = n.value
+  nodeChildren = n.children
+  
+  #puts n
+  case nodeName
+  when  :Program
+    n.child(0).each  do |i| 
+    return i
+    end
+  when :Function
+    e = n.child(3)
+    return e
+  when  :Block
+    i = n.child(0) #do |i|
+    return i
+  end
+end
+
+
+   
 
 LLVM.init_x86
 $symbol_table = Hash.new 
@@ -386,7 +455,7 @@ class UnparsePidginC
           h({:hs => 1},
            h_star({}, " , ", retvals), 
                 name,
-            "(", h_star({}, ", ", args), ")"),
+            "(", h_star({}, " * ", *args), ")"),
             body)
       end
       rule :Block do |block| 
@@ -438,7 +507,7 @@ class UnparsePidginC
         h({},'*', pointer_var)
       end
       rule :ArrayRef do |name,args|
-        h({},name,'[',*args.children,']')
+        h({},name,'[',*args,']')
       end
       #rule :FunctionCall do |func, args|
       #  h({}, func, "(", args, ")")
@@ -461,8 +530,8 @@ class UnparsePidginC
       rule :PointerAssignment do |p_var|
         v({}, p_var)
       end
-      rule :TypeDecl do |t_var|
-        h({}, *t_var.children)
+      rule :TypeDecl do |name ,t_var |
+        h({},*t_var.children)
       end
       rule :FunctionCall do |func_call ,args|
         h({}, *func_call ,"(" ,
@@ -471,10 +540,9 @@ class UnparsePidginC
       rule :Variable  do |var|
         h({}, var)
       end
-      rule :parallelPragmaBlock do |  pblock| 
-          v({ }, "#pragma omp parallel" ,
-            v({ }, *pblock.children))
-      end
+      #rule :ParallelPragmaBlock do |  pblock| 
+      #    v({ },'{', v({ }, *pblock) , '}') 
+      #end
     end
 
     box = boxer.unparse_node node
@@ -492,14 +560,14 @@ opts = OptionParser.new do |opts|
   opts.on("-p","--parse", "Parsed output") do |parse|
      options[:p] = parsed_output() 
   end
-  opts.on("-u","--unparse", "Unparsed original input") do |unparse|
-    options[:u] = unparse()
-  end
-  opts.on("-ll","--llvm-code-gen", "LLVM Code generation") do |llvm_codegen|
+  #opts.on("-u","--unparse", "Unparsed original input") do |unparse|
+  #  options[:u] = unparse()
+  #end
+  opts.on("-llvm","--llvm-code-gen", "LLVM Code generation") do |llvm_codegen|
     options[:ll] = llvm_codegen()
   end
-   opts.on("-ll","--progam-codegen", "Pragma Code Generation") do |prag|
-    options[:o] = pragma_codegen
+   opts.on("-o","--progam-codegen", "Pragma Code Generation") do |prag|
+    options[:o] = new_unparse()
   end
 end
 
