@@ -20,16 +20,25 @@ def parsed_output()
 end
 
 def new_unparse()
-    parser = PCParser.new
-    s = parser.parse_file
-    tt = pragma_codegen(s)
-    a = UnparsePidginC.new
-    result = a.unparse(tt)
-    print result 
+  parser = PCParser.new
+  s = parser.parse_file
+  main_array = s
+  l = main_array.length
+  headers = s[0]
+  headers.each  do |i|
+    puts   i.child(0)
+   end
+  par_nodes_after = s.index(headers) + 1
+  pnode = s[1]
+  tt = pragma_codegen(pnode)
+  a = UnparsePidginC.new
+  result = a.unparse(tt)
+  print result 
 end
 
 def pragma_codegen(s)
-  node = return_node(s)
+  program_node = s
+  node = return_node(program_node)
   block_name = return_node(node)
   block_child = return_node(block_name)
   block_child.each do |i|
@@ -37,7 +46,7 @@ def pragma_codegen(s)
   if g.eql?(:ParallelPragmaBlock)
    index = block_child.index(i)
    pragma_block = block_child.delete(i)
-   stmts = generate_block_to_insert_in_main()
+    stmts = generate_block_to_insert_in_main()
    point = index
    stmts.each do |i|
     block_child.insert(point,i)
@@ -48,6 +57,8 @@ def pragma_codegen(s)
   end 
 return s
 end
+
+
 
 
 def  generate_block_to_insert_in_main()
@@ -89,11 +100,10 @@ def return_node(n)
   nodeName = n.value
   nodeChildren = n.children
   
-  #puts n
   case nodeName
-  when  :Program
-    n.child(0).each  do |i| 
-    return i
+  when  :Program 
+    n.child(0).each do |i|
+      return i
     end
   when :Function
     e = n.child(3)
@@ -456,7 +466,7 @@ class UnparsePidginC
     boxer = ShadowBoxing.new  do
 
      rule :Program  do | body|
-        v({:is => 2},
+        v({:is => 0},
           v({},
             *body.children)
        )
@@ -551,6 +561,10 @@ class UnparsePidginC
       rule :Variable  do |var|
         h({}, var)
       end
+     rule :Header  do |header|
+        v({}, header)
+      end
+
       #rule :ParallelPragmaBlock do |  pblock| 
       #    v({ },'{', v({ }, *pblock) , '}') 
       #end

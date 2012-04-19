@@ -14,6 +14,7 @@ rule
 
 target:
    program { result = :Program[val[0]] }
+  | header_decls  program { result = [val[0], :Program[val[1]]] }
   ;
 
 
@@ -26,7 +27,17 @@ target:
   | type_decls function_defs { result = val[0] + val[1]  } /*Remove type_decls from this and below line */
   | type_decls { result = val[0] }
   | { result = [] }
+  ;
 
+  header_decls:
+    header_decls header { result = val[0],:Header[val[1]] }
+  | header { result = :Header[val[0]] }
+  ;
+
+  header:
+  '#' INCLUDE REL_OP STDIO '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
+  | '#' INCLUDE REL_OP OMP  '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
+  ;
 
 function_defs:
     function_defs  function_def  { result = val[0] + [val[1]] }
