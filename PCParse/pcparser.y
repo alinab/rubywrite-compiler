@@ -40,13 +40,13 @@ function_def:
   ;
 
   formal_params:
-    formal_params ',' formal_param  { result =val[0], val[2] }
+    formal_params ',' formal_param  { result = val[0] ,val[2] }
   | formal_param  { result = val[0] }
   ;
 
   formal_param:
     typename  { result = val[0] }
-  | typename IDENTIFIER  { result = val[0] , val[1] }
+  | typename IDENTIFIER  { result = val[0] ,  val[1] }
   | typename '&' IDENTIFIER  { result = val[0] , val[2] }
   | typename array_formal  { result = val[0] , val[1] }
   | typename pointer_decl  { result = val[0] , val[1] }
@@ -58,6 +58,7 @@ function_def:
   | INT
   | DOUBLE
   | VOID
+  | PTHREAD_T
   ;
  
   /*Rule defining a declaration with a type and a list of one or more variables/functions */
@@ -82,7 +83,7 @@ function_def:
 /* Rule defining a function declaration */
    fn_decl:
     IDENTIFIER '(' ')'  { result = [val[0],:Formals[[]]] }
-  | IDENTIFIER '(' formal_params ')' { result = [val[0],:Formals[val[2]]] }
+| IDENTIFIER '(' formal_params ')' { result = [val[0] ,:Formals[val[2]]] }
   ;
 
   array_formal:
@@ -119,7 +120,7 @@ function_def:
   | type_decl { result = val[0] }
   | pointer_decl {result = val[0] }
   | fn_decl
-  | PRAGMA OMP PARALLEL '{' stmt_list  '}' { result = :parallelPragmaBlock[val[4]] } 
+  | '#' PRAGMA OMP PARALLEL '{' stmt_list '}' { result = :ParallelPragmaBlock[val[5]] }
   ;
 
 
