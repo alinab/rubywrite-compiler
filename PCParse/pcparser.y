@@ -14,7 +14,7 @@ rule
 
 target:
    program { result = :Program[val[0]] }
-  | header_decls  program { result = [val[0], :Program[val[1]]] }
+  | header_decls  program { result = [:Header[val[0]], :Program[val[1]]] }
   ;
 
 
@@ -30,8 +30,8 @@ target:
   ;
 
   header_decls:
-    header_decls header { result = val[0],:Header[val[1]] }
-  | header { result = :Header[val[0]] }
+    header_decls header { result = val[0] + val[1] }
+  | header { result = val[0] }
   ;
 
   header:
