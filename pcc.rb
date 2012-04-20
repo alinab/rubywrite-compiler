@@ -19,15 +19,20 @@ def parsed_output()
     puts
 end
 
+def unparse()
+  parser = PCParser.new
+  s = parser.parse_file
+  a = UnparsePidginC.new
+  result = a.unparse(s)
+  print result 
+end
+
 def new_unparse()
   parser = PCParser.new
   s = parser.parse_file
   main_array = s
   l = main_array.length
   headers = s[0]
- # headers.each  do |i|
- #   puts   i.child(0)
- #  end
   par_nodes_after = s.index(headers) + 1
   pnode = s[1]
   #tt_array holds the entire program AST with pos 0 having the headers
@@ -51,7 +56,8 @@ def pragma_codegen(s,p_index,pg_array)
   if g.eql?(:ParallelPragmaBlock)
    index = block_child.index(i)
    pragma_block = block_child.delete(i)
-   pg_array.insert(p_index,pragma_block)
+   transf_pragma_block = build_pragma_block(pragma_block)
+   pg_array.insert(p_index,transf_pragma_block)
    stmts = generate_block_to_insert_in_main()
    point = index
    stmts.each do |i|
@@ -64,6 +70,33 @@ def pragma_codegen(s,p_index,pg_array)
 return pg_array
 end
 
+def build_pragma_block(pragma)
+  pg_n = :Program
+  pg_child = Array.new
+
+  func_child = Array.new
+  func_n = :Function
+  
+  func_ret_type = "void"
+  func_pthread_name = "*Test"
+  func_child.push(func_ret_type)
+  func_child.push(func_pthread_name)
+  func = func_n[func_child]
+
+  for_ret_type = "void"
+  for_arg_name = "* args"
+  formals = Array.new
+  formals.push(for_ret_type)
+  formals.push(for_arg_name)
+  func_child.push(formals)
+
+
+  pg_child.push(func)
+  res = pg_n[pg_child]
+  res.prettyprint STDOUT
+  
+  
+end
 
 
 
@@ -480,9 +513,9 @@ class UnparsePidginC
       rule :Function do |retvals, name, args, body|
         v({:is => 0},
           h({:hs => 1},
-           h_star({}, " , ", retvals), 
+           v({},' ',  retvals), 
                 name,
-            "(", h_star({}, " * ", *args), ")"),
+            "(", h_star({},', ' , *args), ")"),
             body)
       end
       rule :Block do |block| 
@@ -540,7 +573,7 @@ class UnparsePidginC
       #  h({}, func, "(", args, ")")
       #end
       rule :Formals do |args|
-        v({}, *args.children)
+        v({},' ' , *args.children)
       end
       rule :ConstInt do |num|
         h({}, num)
@@ -571,8 +604,8 @@ class UnparsePidginC
         v({}, *header)
       end
       rule :ParallelPragmaBlock do |  pblock| 
-          v({ },'{',
-            h({ }, *pblock.children) , '}') 
+         v({ },
+            v({ },'{', *pblock.children) , '}')
       end
     end
 
@@ -591,9 +624,9 @@ opts = OptionParser.new do |opts|
   opts.on("-p","--parse", "Parsed output") do |parse|
      options[:p] = parsed_output() 
   end
-  #opts.on("-u","--unparse", "Unparsed original input") do |unparse|
-  #  options[:u] = unparse()
-  #end
+  opts.on("-u","--unparse", "Unparsed original input") do |unparse|
+    options[:u] = unparse()
+  end
   opts.on("-llvm","--llvm-code-gen", "LLVM Code generation") do |llvm_codegen|
     options[:ll] = llvm_codegen()
   end
