@@ -82,7 +82,8 @@ function_def:
  
   /* Rule defining single declaration or a list of declarations */
     decl_list:
-    decl_list ',' lval { result = val[0] + val[1] + val[2]   }
+   decl_list ',' lval { result = val[0] ,val[2] }
+/*  { result = val[0] + val[1] + val[2]   }*/
  /*| expr     Putting decl here gives rise to reduce/reduce conflicts */ 
 /*| '*' IDENTIFIER { result = val[1] }*/
    | lval
