@@ -63,7 +63,7 @@ function_def:
   | typename IDENTIFIER  { result = val[0] + ' ' + val[1] }
   | typename '&' IDENTIFIER  { result = val[0] , val[2] }
   | typename array_formal  { result = val[0] , val[1] }
-  | typename pointer_decl  { result = val[0] , val[1] }
+  | typename pointer_decl  { result = val[0] + val[1] }
   | { result =  ' '  } /*empty formal params */
   ;
  
@@ -84,13 +84,14 @@ function_def:
     decl_list:
     decl_list ',' lval { result = val[0] + val[1] + val[2]   }
  /*| expr     Putting decl here gives rise to reduce/reduce conflicts */ 
+/*| '*' IDENTIFIER { result = val[1] }*/
    | lval
    ;
 
 
 /*Adding a new rule for parsing pointer declarations */
   pointer_decl:
-   '*' IDENTIFIER { result = val[1] } 
+   '*' IDENTIFIER { result =  val[0] + ' ' + val[1] } 
   ;
 
 
@@ -146,7 +147,7 @@ function_def:
   | RETURN  { result = :ReturnStmt[] }
   | RETURN expr  { result = :ReturnStmt[val[1]] }
   | expr { result = val[0] }
-  | pointer_decl '=' expr { result = :PointerDecl[val[0] ,val[2]] }
+  | pointer_decl '=' expr { result = :PointerVal[val[0] ,val[2]] }
   | lval '=' '&' expr { result = :PointerRef[val[0],val[3]] }
   ;
   
@@ -168,7 +169,7 @@ function_def:
   lval:
     IDENTIFIER { result = val[0]}
   | array_ref  
-  | pointer_decl {result = val[0] }
+  | pointer_decl  
   ;
 
 

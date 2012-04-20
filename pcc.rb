@@ -83,17 +83,42 @@ def build_pragma_block(pragma)
   func_child.push(func_pthread_name)
   func = func_n[func_child]
 
-  for_ret_type = "void"
-  for_arg_name = "* args"
+  for_ret_type = "void * args"
+  #for_arg_name = "*args"
+
+  p_arg_n = :PointerDecl
+  p_arg_array = Array.new  
+  p_arg_array.push(for_ret_type)
+
+
   formals = Array.new
   formals.push(for_ret_type)
-  formals.push(for_arg_name)
+  #formals.push(for_arg_name)
   func_child.push(formals)
+ 
+  b_n = :Block
+  
+  block_child = Array.new
+
+  pthread_arg_stmt = Array.new
+  pthread_type_n = :TypeDecls
 
 
+  pthread_ret_type = "int"
+  pthread_ret_name = "tid"
+  pthread_arg_stmt.push(pthread_ret_type)
+  pthread_arg_stmt.push(pthread_ret_name)
+
+  pth_type_decl = pthread_type_n[pthread_arg_stmt]
+  block_child.push(pth_type_decl)
+  block = b_n[block_child]
+  func_child.push(block) 
+
+  block_child.push(pragma)
   pg_child.push(func)
   res = pg_n[pg_child]
-  res.prettyprint STDOUT
+  #res.prettyprint STDOUT
+  return res
   
   
 end
@@ -515,7 +540,7 @@ class UnparsePidginC
           h({:hs => 1},
            v({},' ',  retvals), 
                 name,
-            "(", h_star({},', ' , *args), ")"),
+            "(", h_star({},',',*args),")"),
             body)
       end
       rule :Block do |block| 
@@ -563,7 +588,7 @@ class UnparsePidginC
       rule :ReturnStmt do ||
         h({}, "return")
       end
-      rule :PointerDecl do |pointer_var|
+      rule :PointerVal do |pointer_var|
         h({},'*', pointer_var)
       end
       rule :ArrayRef do |name,args|
@@ -605,7 +630,7 @@ class UnparsePidginC
       end
       rule :ParallelPragmaBlock do |  pblock| 
          v({ },
-            v({ },'{', *pblock.children) , '}')
+            v({ }, *pblock.children) ,)
       end
     end
 
