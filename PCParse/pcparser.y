@@ -14,7 +14,7 @@ rule
 
 target:
    program { result = :Program[val[0]] }
-  | header_decls  program { result = [:Header[val[0]], :Program[val[1]]] }
+| header_decls  program { result = [:Header[val[0]], :Program[val[1]]] }
   ;
 
 
@@ -30,13 +30,14 @@ target:
   ;
 
   header_decls:
-    header_decls header { result = val[0] + val[1] }
-  | header { result = val[0] }
+   header_decls header { result = val[0] + [val[1]] }
+  | header { result = [val[0]] }
   ;
 
   header:
   '#' INCLUDE REL_OP STDIO '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
   | '#' INCLUDE REL_OP OMP  '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
+  | '#' INCLUDE REL_OP PTHREAD  '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
   ;
 
 function_defs:
@@ -45,19 +46,21 @@ function_defs:
   ;
 
   
+/*Added function definition with return type a pointer to a value */
 function_def:
     typename IDENTIFIER '(' formal_params ')' block  { result = :Function[val[0],val[1],val[3],val[5]] }
+   | typename '*' IDENTIFIER '(' formal_params ')' block  { result = :Function[val[0],val[1],val[2],val[4],val[6]] } 
 /* | typename IDENTIFIER '(' ')' block  { result = :Function[val[0],val[1],,val[4]] } */
   ;
 
   formal_params:
-    formal_params ',' formal_param  { result = val[0] ,val[2] }
-  | formal_param  { result = val[0] }
+    formal_params ',' formal_param  { result = val[0] + [val[2]] }
+  | formal_param  { result = [val[0]] }
   ;
 
   formal_param:
     typename  { result = val[0] }
-  | typename IDENTIFIER  { result = val[0] ,  val[1] }
+  | typename IDENTIFIER  { result = val[0] + ' ' + val[1] }
   | typename '&' IDENTIFIER  { result = val[0] , val[2] }
   | typename array_formal  { result = val[0] , val[1] }
   | typename pointer_decl  { result = val[0] , val[1] }
