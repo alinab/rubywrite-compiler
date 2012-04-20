@@ -25,18 +25,20 @@ def new_unparse()
   main_array = s
   l = main_array.length
   headers = s[0]
-  headers.each  do |i|
-    puts   i.child(0)
-   end
+ # headers.each  do |i|
+ #   puts   i.child(0)
+ #  end
   par_nodes_after = s.index(headers) + 1
   pnode = s[1]
-  tt = pragma_codegen(pnode)
+  tt_array = pragma_codegen(pnode,par_nodes_after,main_array)
   a = UnparsePidginC.new
-  result = a.unparse(tt)
+  tt_array.each do |i|
+  result = a.unparse(i)
   print result 
+  end
 end
 
-def pragma_codegen(s)
+def pragma_codegen(s,p_index,pg_array)
   program_node = s
   node = return_node(program_node)
   block_name = return_node(node)
@@ -46,7 +48,8 @@ def pragma_codegen(s)
   if g.eql?(:ParallelPragmaBlock)
    index = block_child.index(i)
    pragma_block = block_child.delete(i)
-    stmts = generate_block_to_insert_in_main()
+   pg_array.insert(p_index,pragma_block)
+   stmts = generate_block_to_insert_in_main()
    point = index
    stmts.each do |i|
     block_child.insert(point,i)
@@ -55,7 +58,7 @@ def pragma_codegen(s)
    #puts block_child
    end
   end 
-return s
+return pg_array
 end
 
 
@@ -562,12 +565,12 @@ class UnparsePidginC
         h({}, var)
       end
      rule :Header  do |header|
-        v({}, header)
+        v({}, *header)
       end
-
-      #rule :ParallelPragmaBlock do |  pblock| 
-      #    v({ },'{', v({ }, *pblock) , '}') 
-      #end
+      rule :ParallelPragmaBlock do |  pblock| 
+          v({ },'{',
+            h({ }, *pblock.children) , '}') 
+      end
     end
 
     box = boxer.unparse_node node
