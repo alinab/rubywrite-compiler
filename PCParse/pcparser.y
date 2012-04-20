@@ -169,7 +169,7 @@ function_def:
   
   lval:
     IDENTIFIER { result = val[0]}
-  | array_ref  
+  | array_def  
   | pointer_decl  
   ;
 
@@ -181,6 +181,7 @@ expr:
   | STRING  { result = :ConstString[val[0]] }
   | function_call 
   | array_def
+  | '&' array_def { result = val[0] + val[1] } 
   | expr '+' expr  { result = :BinaryOp[val[0], '+', val[2]]}
   | expr '-' expr  { result = :BinaryOp[val[0], '-', val[2]] }
   | expr '*' expr  { result = :BinaryOp[val[0], '*', val[2]] }
