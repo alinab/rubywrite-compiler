@@ -142,6 +142,7 @@ function_def:
 /*Added rule for statements with pointer assignments */
     simple_stmt:
     lval '=' expr  { result = :Assignment[val[0] ,val[2]] }
+  | function_call { result = val[0] }
   | BREAK  { result = :BreakStmt[] }
   | CONTINUE  { result = :ContinueStmt[] }
   | RETURN  { result = :ReturnStmt[] }
@@ -179,7 +180,7 @@ expr:
   | REAL_NUM  { result = :ConstReal[val[0]] }
   | STRING  { result = :ConstString[val[0]] }
   | function_call 
-  | array_ref 
+  | array_def
   | expr '+' expr  { result = :BinaryOp[val[0], '+', val[2]]}
   | expr '-' expr  { result = :BinaryOp[val[0], '-', val[2]] }
   | expr '*' expr  { result = :BinaryOp[val[0], '*', val[2]] }
@@ -194,8 +195,8 @@ expr:
   ;
 
 
-  array_ref:
-  IDENTIFIER '[' array_index_list ']'  { result = :ArrayRef[val[0] ,val[2]] }
+  array_def:
+  IDENTIFIER '[' array_index_list ']'  { result = :ArrayDef[val[0] ,val[2]] }
   ;
 
   array_index_list:
@@ -204,7 +205,7 @@ expr:
   ;
 
   function_call:
-    IDENTIFIER '(' actual_params ')'  { result = :FunctionCall[val[0],val[2]] }
+IDENTIFIER '(' actual_params ')'{ result = :FunctionCall[val[0],val[2]] }
   | IDENTIFIER '(' ')'  { result =   val[0]+val[1]+val[2] }
   ;
 
