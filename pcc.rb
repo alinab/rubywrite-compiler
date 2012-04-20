@@ -127,37 +127,71 @@ end
 
 def  generate_block_to_insert_in_main()
   stmt_list = Array.new
-  stmt_0 = :TypeDecls["pthread_t",:ArrayRef["threads",:Variable["NUM_THREADS"]]]
+  stmt_0 = :TypeDecls["pthread_t",:ArrayDef["threads",:Variable["NUM_THREADS"]]]
   stmt_2 =  :TypeDecls["int","rc ,i"]
-  stmt_1 =  :TypeDecls["int",:ArrayRef["thread_args",:Variable["NUM_THREADS"]]]
+  stmt_1 =  :TypeDecls["int",:ArrayDef["thread_args",:Variable["NUM_THREADS"]]]
   stmt_list.push(stmt_0)
   stmt_list.push(stmt_1)
   stmt_list.push(stmt_2)
 
 
-  for_array_stmts = Array.new
+  for_array_first_stmts = Array.new
   for_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]]\
                   ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
                 :Variable["NUM_THREADS"  ] ]  \
               ,:Assignment["i" \
            ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
-             ,:ConstInt[  "1"  ] ]],for_array_stmts ]
+             ,:ConstInt[  "1"  ] ]],for_array_first_stmts ]
 
 
-  for_stmt_1 = :Assignment[ :ArrayRef[\
+  for_stmt_1 = :Assignment[ :ArrayDef[\
                "thread_args" ,:Variable[ "i"  ] ] \
             , :Variable[ "i"  ] ]
    for_stmt_2 = :FunctionCall[ \
-             "printf"  ,[:ConstString[ "\"Im main:creating thread %d\\n\""  ] \
+             "printf"  ,[:ConstString[ "\"Inside main:creating thread %d\\n\""  ] \
              ,:Variable[   "i"  ] ]]
 
-  for_array_stmts.push(for_stmt_1)
-  for_array_stmts.push(for_stmt_2)
-           
+  for_stmt_3 = :Assignment["rc" ,:FunctionCall \
+               ["pthread_create" \
+               ,[:UnaryOp["&",:ArrayDef[\
+                               "threads", \
+                                :Variable["i"]]] \
+                  , :ConstString [ \
+                       "NULL"] \
+                  ,:ConstString [ \
+                    "Test"]  ]]]
+                  
+    
+  for_array_first_stmts.push(for_stmt_1)
+  for_array_first_stmts.push(for_stmt_2)
+  for_array_first_stmts.push(for_stmt_3)         
+
+  for_array_join_stmts = Array.new
+  for_j_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]           ]    ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
+                :Variable["NUM_THREADS"  ] ]  \
+              ,:Assignment["i" \
+           ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
+             ,:ConstInt[  "1"  ] ]],for_array_join_stmts ]
+
+ #for_j_stmt.prettyprint STDOUT 
+ #exit
+ for_join_th_stmt_1 = :Assignment["rc" ,:FunctionCall \
+               ["pthread_join" \
+               ,[:ArrayDef[\
+                     "threads", \
+                     :Variable["i"]] \
+                  , :ConstString [ \
+                       "NULL"] ]]]
+   
+  #for_join_th_stmt_1.prettyprint STDOUT
+  
+  for_array_join_stmts.push(for_join_th_stmt_1)
+  #for_array_join_stmts.prettyprint STDOUT
+  #exit       
 
   stmt_list.push(for_stmt)
+  stmt_list.push(for_j_stmt)
   return stmt_list
-
 end
  
 def return_node(n)
@@ -591,7 +625,7 @@ class UnparsePidginC
       rule :PointerVal do |pointer_var|
         h({},'*', pointer_var)
       end
-      rule :ArrayRef do |name,args|
+      rule :ArrayDef do |name,args|
         h({},name,'[',*args,']')
       end
       #rule :FunctionCall do |func, args|
@@ -620,7 +654,7 @@ class UnparsePidginC
       end
       rule :FunctionCall do |func_call ,args|
         h({}, *func_call ,"(" ,
-          h_star({:hs => 1},',' ,*args.children ) ,")" ,';')
+          h_star({:hs => 1},',' ,*args.children ) ,")",';')
       end
       rule :Variable  do |var|
         h({}, var)

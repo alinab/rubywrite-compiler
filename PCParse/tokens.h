@@ -25,7 +25,12 @@
 #define PRAGMA 281
 #define OMP 282
 #define PARALLEL 283
-#define END_OF_INPUT 284
+#define PTHREAD_T 284
+#define INCLUDE 285
+#define STDIO 286
+#define H 287
+#define PTHREAD 288
+#define END_OF_INPUT 289
 
 #ifdef _INCLUDED_FROM_SCANNER_
 const char* token_name[] = {
@@ -55,6 +60,11 @@ const char* token_name[] = {
    "PRAGMA",
   "OMP",
   "PARALLEL", 
+  "PTHREAD_T",
+  "INCLUDE",
+  "STDIO",
+  "H",
+  "PTHREAD",
   "END_OF_INPUT",
 
 };

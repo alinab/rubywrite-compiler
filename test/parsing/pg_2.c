@@ -1,7 +1,10 @@
+
 int main()
 {
+
   int c;
   int d;
+  int *b;
   b = a + 81;
   printf("a,b %d %d\n",a,b);
   foo();
@@ -39,7 +42,7 @@ void swapNum(int i, int j){
   *j = temp;
 }
 
-int last(int p ,int q, int r)
+int last(int p ,int q, int *r)
 {
   int n;
     int i;

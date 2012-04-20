@@ -131,6 +131,27 @@ parallel {
  return PARALLEL;
  }
 
+pthread_t {
+  return PTHREAD_T;
+    }
+
+include {
+   return INCLUDE;
+   }
+
+stdio {
+  return STDIO;
+}
+
+h {
+  return H;
+}
+
+pthread {
+  return PTHREAD;
+ }
+
+
 %{
   /* Operators.  Since '*', '+', and '-' are also unary operators these are
      returned as individual tokens. */
@@ -166,6 +187,8 @@ parallel {
 ","	{ return ','; }
 "\""	{ return '"'; }
 "#"     { return '#'; }
+"&"     { return '&'; }
+
 
 %{
   /* Real numbers.  Don't grab the `.' part of a dot operator as part of the

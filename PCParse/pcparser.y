@@ -142,7 +142,6 @@ function_def:
 /*Added rule for statements with pointer assignments */
     simple_stmt:
     lval '=' expr  { result = :Assignment[val[0] ,val[2]] }
-  | function_call { result = val[0] }
   | BREAK  { result = :BreakStmt[] }
   | CONTINUE  { result = :ContinueStmt[] }
   | RETURN  { result = :ReturnStmt[] }
@@ -205,11 +204,12 @@ expr:
   | expr  { result = val[0] }
   ;
 
+ 
   function_call:
 IDENTIFIER '(' actual_params ')'{ result = :FunctionCall[val[0],val[2]] }
   | IDENTIFIER '(' ')'  { result =   val[0]+val[1]+val[2] }
   ;
-
+ 
   actual_params:
      actual_params ',' expr { result = val[0] + [val[2]] } 
    | expr { result = [val[0]] } 

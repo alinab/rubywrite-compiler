@@ -1,6 +1,7 @@
 int main()
 { 
   int a[20];
+  & a[1];
   int i,b;
   for(i = 0; i < 10 ; i = i + 1)
   {
