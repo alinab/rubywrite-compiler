@@ -30,6 +30,9 @@ def new_unparse()
  #  end
   par_nodes_after = s.index(headers) + 1
   pnode = s[1]
+  #tt_array holds the entire program AST with pos 0 having the headers
+  # pos 1 having the omp parallel block 
+  # and pos 2 having the node for "main" in Pidgin C"
   tt_array = pragma_codegen(pnode,par_nodes_after,main_array)
   a = UnparsePidginC.new
   tt_array.each do |i|
