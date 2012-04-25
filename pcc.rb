@@ -92,7 +92,7 @@ def pragma_codegen(s,p_index,pg_array)
   #print $var_vals
   #ds_struct.prettyprint STDOUT 
   #exit
-  pg_array.unshift(ds_struct) 
+  pg_array.insert(1,ds_struct) #was unshift earlier 
 
   num_funcs = 0
   stmt_0 = :TypeDecls["pthread_t",:ArrayDef["threads",:Variable["NUM_THREADS"]]]
