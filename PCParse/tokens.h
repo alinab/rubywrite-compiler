@@ -30,7 +30,9 @@
 #define STDIO 286
 #define H 287
 #define PTHREAD 288
-#define END_OF_INPUT 289
+#define DEFINE 289
+#define NUM_THREADS 290
+#define END_OF_INPUT 291
 
 #ifdef _INCLUDED_FROM_SCANNER_
 const char* token_name[] = {
@@ -65,6 +67,8 @@ const char* token_name[] = {
   "STDIO",
   "H",
   "PTHREAD",
+  "DEFINE",
+  "NUM_THREADS",
   "END_OF_INPUT",
 
 };

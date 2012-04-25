@@ -151,6 +151,14 @@ pthread {
   return PTHREAD;
  }
 
+define {
+  return DEFINE;
+ }
+
+NUM_THREADS {
+  return NUM_THREADS;
+}
+
 
 %{
   /* Operators.  Since '*', '+', and '-' are also unary operators these are
