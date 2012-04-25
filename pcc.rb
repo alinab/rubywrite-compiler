@@ -92,7 +92,7 @@ def pragma_codegen(s,p_index,pg_array)
   #print $var_vals
   #ds_struct.prettyprint STDOUT 
   #exit
-  pg_array.insert(0,ds_struct) ##changed to 0 for inserting first
+  pg_array.unshift(ds_struct) 
 
   num_funcs = 0
   stmt_0 = :TypeDecls["pthread_t",:ArrayDef["threads",:Variable["NUM_THREADS"]]]
@@ -112,11 +112,11 @@ def pragma_codegen(s,p_index,pg_array)
     num_funcs = num_funcs + 1
     stmts = generate_block_to_insert_in_main(num_funcs,c_struct_name,var_names)
     index = block_child.index(i)
-    
+    #print "index = ",index,"\n"
     pragma_block = block_child.delete(i)
        
     transf_pragma_block = build_pragma_block(pragma_block,num_funcs,c_struct_name,var_names)
-    pg_array.insert(p_index,transf_pragma_block)
+    pg_array.insert(p_index+1,transf_pragma_block)
 
     
     point = index
@@ -215,22 +215,18 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
  
   var_ret_type = "int"
  # var_names.each do |i|
-  var_ret_name = "var_"+var_names[0].to_s
+  var_ret_name = var_names[0].to_s
   var_arg_stmt.push(var_ret_type)
   var_arg_stmt.push(var_ret_name)
   var_type_decl = var_type_n[var_arg_stmt]
   block_child.push(var_type_decl)
 
-  #main_struct_name = "pth_arg_struct"
-  #stmt_3 = :TypeDecls[c_struct_name,main_struct_name]
-  #block_child.push(stmt_3)      
-  
   pt_to_struct = "*((st_data *) args)"
 
   #var_names.each do |i|
   pt_var = pt_to_struct + '.'+var_names[0].to_s
   pt_var_stmt = :Assignment[var_ret_name,pt_var]
-  print pt_var_stmt,"\n"
+  #print pt_var_stmt,"\n"
   
   block_child.push(pt_var_stmt)
 
@@ -281,7 +277,7 @@ def  generate_block_to_insert_in_main(num_f,c_struct_name,var_names)
   n = 0
   var_names.each do |i|
   struct_var_decl_with_var = struct_var_decl+i.to_s
-  struct_assign_stmt= :Assignment[struct_var_decl_with_var ,var_names[n]]
+  struct_assign_stmt= :Assignment[struct_var_decl_with_var ,:ConstInt["3"]]
   stmt_list.push(struct_assign_stmt) 
   n = n + 1
   end
