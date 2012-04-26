@@ -159,6 +159,10 @@ NUM_THREADS {
   return NUM_THREADS;
 }
 
+stdlib {
+  return STDLIB;
+}
+
 
 %{
   /* Operators.  Since '*', '+', and '-' are also unary operators these are

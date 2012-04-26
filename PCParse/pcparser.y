@@ -38,6 +38,7 @@ target:
   '#' INCLUDE REL_OP STDIO '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
   | '#' INCLUDE REL_OP OMP  '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
   | '#' INCLUDE REL_OP PTHREAD  '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] }
+  | '#' INCLUDE REL_OP STDLIB   '.' H REL_OP { result = val[0] + val[1] + val[2] + val[3] + val[4] + val[5] +val[6] } 
   | '#' DEFINE NUM_THREADS INT_NUM  { result = val[0] + val[1] + ' ' + val[2] + ' ' + val[3] }
   ;
 

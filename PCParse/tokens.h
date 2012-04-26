@@ -32,7 +32,8 @@
 #define PTHREAD 288
 #define DEFINE 289
 #define NUM_THREADS 290
-#define END_OF_INPUT 291
+#define STDLIB 291
+#define END_OF_INPUT 292
 
 #ifdef _INCLUDED_FROM_SCANNER_
 const char* token_name[] = {
@@ -69,6 +70,7 @@ const char* token_name[] = {
   "PTHREAD",
   "DEFINE",
   "NUM_THREADS",
+  "STDLIB",
   "END_OF_INPUT",
 
 };
