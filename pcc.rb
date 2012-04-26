@@ -133,6 +133,21 @@ def pragma_codegen(s,p_index,pg_array)
   g = i.value
   if g.eql?(:ParallelPragmaBlock)
     
+    i.child(0).each do |l|
+        v = l.child(1)
+              
+        a = v.children[2]
+
+         if a == "omp_get_num_threads()"
+          v.children[2] = "NUM_THREADS"
+           b = v.children[1]
+           if b == "omp_get_thread_num()"
+             v.children[1] = "tid"
+           end
+         end 
+    end
+
+
     num_funcs = num_funcs + 1
     stmts = generate_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
     index = block_child.index(i)
@@ -236,7 +251,7 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   var_ret_type = "int"
   var_names.each do |i|
     var_arg_stmt = Array.new
-    var_ret_name = i  
+    var_ret_name = i.to_s
     var_arg_stmt.push(var_ret_type)
     var_arg_stmt.push(var_ret_name)
     #print var_arg_stmt,"\n"
@@ -262,7 +277,8 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
 
   var_names.each do |i|
   pt_var = pt_to_struct + i#var_names[0].to_s
-  pt_var_stmt = :Assignment[i,pt_var]
+  pt_to_var = i.to_s
+  pt_var_stmt = :Assignment[pt_to_var,pt_var]
   block_child.push(pt_var_stmt)
   end
   #print pt_var_stmt,"\n"
@@ -364,16 +380,15 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
       
   #each_for =  for_stmt_thread+i
   each_for  = :Assignment["rc" ,:FunctionCall \
-                                                  ["pthread_create" \
-                                                   ,[:UnaryOp["&",:ArrayDef[\
-                                                                            "threads", \
-                                                                            :Variable["i"]]] \
-                                                     , :ConstString [ \
-                                                                      "NULL"] \
-                                                     ,:ConstString [ \
-                                                                     "Test"+num_f.to_s] \
-                                                     ,"(void *)"+" &" +main_struct_name]]]
-
+                                    ["pthread_create" \
+                                 ,[:UnaryOp["&",:ArrayDef[\
+                                    "threads", \
+                                   :Variable["i"]]] \
+                               , :ConstString [ \
+                                 "NULL"] \
+                               ,:ConstString [ \
+                                 "Test"+num_f.to_s] \
+                         ,"(void *)"+" &" +main_struct_name]]]
    for_array_first_stmts.push(each_for)         
    #end
 
