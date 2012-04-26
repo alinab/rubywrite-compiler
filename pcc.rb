@@ -66,24 +66,35 @@ def pragma_codegen(s,p_index,pg_array)
   len =  var_types.length
 
   c_struct_node  = :Struct
-  c_struct_name = "st_data"
+  c_struct_main =  Array.new #:Struct_name #["st_data"
   c_struct_elem = ["typedef"," ","struct"," " ,"{"] ##
-  
-  for k in (0..len-1) do 
+  c_struct_name = :Struct_name[c_struct_elem] #["st_data"
+ 
+  c_struct_main.push(c_struct_name)
+ 
+ struct_each = :Struct_assign 
+ for k in (0..len-1) do 
    struct_mem = Array.new
    struct_mem.push(var_types[k]) 
    #v = :Variable[var_names[k]]
    struct_mem.push(' ')
    struct_mem.push(var_names[k])
-  
-   struct_mem_node = :Struct_data[struct_mem]
-   c_struct_elem.push(struct_mem_node)
+   struct_sentence =  :Struct_assign[struct_mem]
+   c_struct_main.push(struct_sentence)
   end
+
+
+  struct_name_for_typ = "data_struct"
   
-  
-  ds_struct = c_struct_node[c_struct_elem]
-    c_struct_elem.push("}")
-  c_struct_elem.push(c_struct_name)
+  c_struct_end  = :Struct_end
+  c_struct_end_array = ["}",struct_name_for_typ]
+  c_struct_node_end = c_struct_end[c_struct_end_array]
+  c_struct_main.push(c_struct_node_end)
+  #c_struct_main.push
+  #c_struct_main.push(
+  ds_struct = c_struct_node[c_struct_main]
+
+  #c_struct_elem.push(c_struct_name)
 
   
     block_child.each do |i|
@@ -110,7 +121,7 @@ def pragma_codegen(s,p_index,pg_array)
   if g.eql?(:ParallelPragmaBlock)
     
     num_funcs = num_funcs + 1
-    stmts = generate_block_to_insert_in_main(num_funcs,c_struct_name,var_names)
+    stmts = generate_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
     index = block_child.index(i)
     #print "index = ",index,"\n"
     pragma_block = block_child.delete(i)
@@ -263,11 +274,11 @@ end
 
 
 
-def  generate_block_to_insert_in_main(num_f,c_struct_name,var_names)
+def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
   stmt_list = Array.new
 
   main_struct_name = "arg_struct"
-  stmt_3 = :TypeDecls[c_struct_name,main_struct_name]
+  stmt_3 = :TypeDecls[struct_name_for_typ,main_struct_name]
   stmt_list.push(stmt_3)      
 
 
@@ -817,15 +828,19 @@ class UnparsePidginC
         v({}, *header)
       end
       rule :Struct  do |s |
-        h({},*s,';')
+        v({},*s.children)
       end
-      rule :Struct_assign  do |s_a |
-        h({},*s_a,';')
+      rule :Struct_name  do |s_a |
+        h({},"\n",*s_a.children,)
       end
 
-      rule :Struct_data do |d |
+      rule :Struct_assign do |d |
         h({},' ' ,*d.children,';')
       end
+      rule :Struct_end  do |s_e|
+        h({},*s_e,';')
+      end
+
       rule :ParallelPragmaBlock do |  pblock| 
          v({ },
             v({ }, *pblock.children) ,)
