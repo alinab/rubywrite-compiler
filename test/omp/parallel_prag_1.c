@@ -1,7 +1,7 @@
-# include < stdio.h >
-# include < omp.h >
-# include < pthread.h >
-# include < stdlib.h >
+# include <stdio.h>
+# include <omp.h>
+# include <pthread.h>
+# include <stdlib.h>
 # define NUM_THREADS 5
 int main ()
 {

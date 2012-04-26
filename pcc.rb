@@ -83,6 +83,14 @@ def pragma_codegen(s,p_index,pg_array)
    c_struct_main.push(struct_sentence)
   end
 
+  struct_mem_tid = Array.new
+  thread_id_data_type = "int"
+  thread_id_data_name = "threads_id"
+  struct_mem_tid.push(thread_id_data_type)
+  struct_mem_tid.push(' ')
+  struct_mem_tid.push(thread_id_data_name)  
+  struct_sentence_tid = :Struct_assign[struct_mem_tid]
+  c_struct_main.push(struct_sentence_tid)
 
   struct_name_for_typ = "data_struct"
   
@@ -110,7 +118,12 @@ def pragma_codegen(s,p_index,pg_array)
   stmt_2 =  :TypeDecls["int","rc ,i"]
   stmt_1 =  :TypeDecls["int",:ArrayDef["thread_args",:Variable["NUM_THREADS"]]]
 
-
+  tid_array = Array.new
+  tid_array.push("int")
+  tid_array.push("tid_vals")
+  tid_node = :TypeDecls[tid_array]
+  
+  block_child.insert(0,tid_node)
   block_child.insert(0,stmt_0)
   block_child.insert(0,stmt_1)
   block_child.insert(0,stmt_2)
@@ -231,6 +244,20 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
     block_child.push(var_type_decl)
   end
 
+
+  
+  pthread_arg_stmt = Array.new
+  pthread_type_n = :TypeDecls
+
+  
+  pthread_ret_type = "int"
+  pthread_ret_name = "tid"
+  pthread_arg_stmt.push(pthread_ret_type)
+  pthread_arg_stmt.push(pthread_ret_name)
+
+  pth_type_decl = pthread_type_n[pthread_arg_stmt]
+  block_child.push(pth_type_decl)
+ 
   pt_to_struct = "((data_struct *) args)->"
 
   var_names.each do |i|
@@ -240,19 +267,19 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   end
   #print pt_var_stmt,"\n"
   
+  pt_var_tid = pt_to_struct + "threads_id"#var_names[0].to_s
+  pt_var_stmt_tid = :Assignment[:Variable["tid"],pt_var_tid]
+  block_child.push(pt_var_stmt_tid)
   
 
-  pthread_arg_stmt = Array.new
-  pthread_type_n = :TypeDecls
+  thread_info_stmt = :FunctionCall["printf" \
+                                   ,[:ConstString[\
+                         "\"The thread currently running is : %d \""],
+                                   :Variable[pthread_ret_name]]]
 
+  
 
-  pthread_ret_type = "int"
-  pthread_ret_name = "tid"
-  pthread_arg_stmt.push(pthread_ret_type)
-  pthread_arg_stmt.push(pthread_ret_name)
-
-  pth_type_decl = pthread_type_n[pthread_arg_stmt]
-  block_child.push(pth_type_decl)
+  block_child.push(thread_info_stmt)
   block = b_n[block_child]
   func_child.push(block) 
 
@@ -295,7 +322,9 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
   n = n + 1
   end
 #  exit
-  
+
+
+   
   for_array_first_stmts = Array.new
   for_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]]\
                   ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
@@ -305,23 +334,36 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
              ,:ConstInt[  "1"  ] ]],for_array_first_stmts ]
 
 
-  for_stmt_1 = :Assignment[ :ArrayDef[\
-               "thread_args" ,:Variable[ "i"  ] ] \
-            , :Variable[ "i"  ] ]
+  for_stmt_1 = :Assignment[:ArrayDef[\
+                        "thread_args" ,:Variable[ "i"]],\
+                       :Variable["i"]]
+
+
+  struct_var_tid = struct_var_decl+"threads_id"
+  struct_tid_assign_stmt= :Assignment[struct_var_tid,:ArrayDef[\
+                        "thread_args" ,:Variable[ "i"]]]
+
+ 
+  #:Variable["tid_vals"]]
+  #struct_tid_var_decl = struct_var_decl+"threads_args[i] "
+
+
    for_stmt_2 = :FunctionCall[ \
              "printf"  ,[:ConstString[ "\"Inside main:creating thread %d\\n\""  ] \
              ,:Variable[   "i"  ] ]]
 
 
+
   for_array_first_stmts.push(for_stmt_1)
+  for_array_first_stmts.push(struct_tid_assign_stmt) 
   for_array_first_stmts.push(for_stmt_2)
   #for_array_first_stmts.push(for_stmt_3)          
   for_stmt_thread = "for_stmt_th"
   stmt_nums = 0
-  var_names.each do |i|
+  #var_names.each do |i|
       
-      each_for =  for_stmt_thread+i
-      each_for  = :Assignment["rc" ,:FunctionCall \
+  #each_for =  for_stmt_thread+i
+  each_for  = :Assignment["rc" ,:FunctionCall \
                                                   ["pthread_create" \
                                                    ,[:UnaryOp["&",:ArrayDef[\
                                                                             "threads", \
@@ -330,15 +372,25 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
                                                                       "NULL"] \
                                                      ,:ConstString [ \
                                                                      "Test"+num_f.to_s] \
-                                                     ,"(void *)"+" &" +main_struct_name+"."+i.to_s]]]
+                                                     ,"(void *)"+" &" +main_struct_name]]]
 
-    for_array_first_stmts.push(each_for)         
-   end
+   for_array_first_stmts.push(each_for)         
+   #end
+
+=begin
+    thread_num_stmt  = :Assignment["rc" ,:FunctionCall \
+                                 ["pthread_create" \
+                          ,[:UnaryOp["&",:ArrayDef[\
+                                 "threads", \
+                               :Variable["i"]]] \
+                               , :ConstString [ \
+                               "NULL"] \
+                              ,:ConstString [ \
+                             "Test"+num_f.to_s] \
+           ,"(void *)"+" &" +main_struct_name+"."+"threads_id"]]]
     
-
-
-
-
+  for_array_first_stmts.push(thread_num_stmt)  
+=end
   for_array_join_stmts = Array.new
   for_j_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]           ]    ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
                 :Variable["NUM_THREADS"  ] ]  \
