@@ -248,18 +248,7 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   var_type_n = :TypeDecls
 
 
-  var_ret_type = "int"
-  var_names.each do |i|
-    var_arg_stmt = Array.new
-    var_ret_name = i.to_s
-    var_arg_stmt.push(var_ret_type)
-    var_arg_stmt.push(var_ret_name)
-    #print var_arg_stmt,"\n"
-    var_type_decl = var_type_n[var_arg_stmt]
-    block_child.push(var_type_decl)
-  end
-
-
+ 
   
   pthread_arg_stmt = Array.new
   pthread_type_n = :TypeDecls
@@ -275,10 +264,20 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
  
   pt_to_struct = "((data_struct *) args)->"
 
+  var_ret_type = "int"
   var_names.each do |i|
+    var_arg_stmt = Array.new
+    var_ret_name = '&'+i.to_s
+    var_arg_stmt.push(var_ret_type)
+    var_arg_stmt.push(var_ret_name)
+    #print var_arg_stmt,"\n"
+    var_type_decl = var_type_n[var_arg_stmt]
+    #block_child.push(var_type_decl)
+  #end
+  #var_names.each do |i|
   pt_var = pt_to_struct + i#var_names[0].to_s
-  pt_to_var = i.to_s
-  pt_var_stmt = :Assignment[pt_to_var,pt_var]
+  pt_to_var = '&'+i.to_s
+  pt_var_stmt = :Assignment[var_type_decl,pt_var]
   block_child.push(pt_var_stmt)
   end
   #print pt_var_stmt,"\n"
