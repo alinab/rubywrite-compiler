@@ -759,7 +759,7 @@ class UnparsePidginC
       end
       rule :For do |init ,cond1,cond2,cond3, stmts|
         v({},
-          v({:is => 2}, h({:hs => 1},init,'(',cond1,cond2,';',cond3 ,')'),'{',
+          v({:is => 2}, h({:hs => 1},init,'(',cond1,';',cond2,';',cond3,')'),'{',
             v({} ,*stmts),'}'))
       end
       rule :WhileStmt do |expr, stmts|
@@ -819,7 +819,7 @@ class UnparsePidginC
       end
       rule :FunctionCall do |func_call ,args|
         h({}, *func_call ,"(" ,
-          h_star({:hs => 1},',' ,*args.children ) ,")",';')
+          h_star({:hs => 1},',' ,*args.children ) ,");")
       end
       rule :Variable  do |var|
         h({}, var)
