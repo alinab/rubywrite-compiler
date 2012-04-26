@@ -232,10 +232,10 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   var_type_decl = var_type_n[var_arg_stmt]
   block_child.push(var_type_decl)
 
-  pt_to_struct = "*((st_data *) args)"
+  pt_to_struct = "((data_struct *) args)->"
 
   #var_names.each do |i|
-  pt_var = pt_to_struct + '.'+var_names[0].to_s
+  pt_var = pt_to_struct +var_names[0].to_s
   pt_var_stmt = :Assignment[var_ret_name,pt_var]
   #print pt_var_stmt,"\n"
   
@@ -319,8 +319,9 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
                        "NULL"] \
                   ,:ConstString [ \
                     "Test"+num_f.to_s] \
-                  ,"(void *)"+" &" +main_struct_name.to_s  ]]]
-                  
+                  ,"(void *)"+" &" +main_struct_name+"."+var_names[0].to_s]]]
+
+                   
     
   for_array_first_stmts.push(for_stmt_1)
   for_array_first_stmts.push(for_stmt_2)
