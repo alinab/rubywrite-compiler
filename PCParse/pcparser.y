@@ -140,6 +140,8 @@ function_def:
   | fn_decl
   | '#' PRAGMA OMP PARALLEL '{' stmt_list '}' { result = :ParallelPragmaBlock[val[5]] }
   | '#' PRAGMA OMP CRITICAL '{' stmt_list '}' { result = :CriticalPragmaBlock[val[5]] } 
+  | '#' PRAGMA OMP SECTIONS  '{' stmt_list '}' { result = :SectionsPragmaBlock[val[5]] } 
+  | '#' PRAGMA OMP SECTION   '{' stmt_list '}' { result = :SectionBlock[val[5]] } 
   ;
 
 
@@ -150,14 +152,15 @@ function_def:
   | CONTINUE  { result = :ContinueStmt[] }
   | RETURN  { result = :ReturnStmt[] }
   | RETURN expr  { result = :ReturnStmt[val[1]] }
-  | expr { result = val[0] }
+  | function_call
+/*  | expr { result = val[0] }*/
   | pointer_decl '=' expr { result = :PointerVal[val[0] ,val[2]] }
   | lval '=' '&' expr { result = :PointerRef[val[0],val[3]] }
   ;
   
  /* Rules for compound statements */
   compound_stmt:
-FOR '(' simple_stmt ';' expr ';' expr  ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
+    FOR '(' expr  ';' expr ';' expr  ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
   | WHILE '(' simple_stmt ')' block  { result = [val[0],val[2],val[4]] }
   | IF '(' simple_stmt ')' block  optional_else  { result = :IfStmt[val[2] ,val[4] ,val[5]] }
   ;
