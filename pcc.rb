@@ -98,19 +98,13 @@ def pragma_codegen(s,p_index,pg_array)
   c_struct_end_array = ["}",struct_name_for_typ]
   c_struct_node_end = c_struct_end[c_struct_end_array]
   c_struct_main.push(c_struct_node_end)
-  #c_struct_main.push
-  #c_struct_main.push(
   ds_struct = c_struct_node[c_struct_main]
-
-  #c_struct_elem.push(c_struct_name)
 
   
     block_child.each do |i|
       DataCreate.run (i)
     end
-  #print $var_vals
-  #ds_struct.prettyprint STDOUT 
-  #exit
+
   pg_array.insert(1,ds_struct) #was unshift earlier 
 
   num_funcs = 0
@@ -131,23 +125,29 @@ def pragma_codegen(s,p_index,pg_array)
 
   block_child.each do |i|
   g = i.value
-  if g.eql?(:ParallelPragmaBlock)
-    
-    i.child(0).each do |l|
-        v = l.child(1)
-              
-        a = v.children[2]
+  if g.eql?(:CriticalPragmaBlock)
+    change_omp_values(i)    
+    num_funcs = num_funcs + 1
+    stmts = generate_critical_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
+    index = block_child.index(i)
+    #print "index = ",index,"\n"
+    pragma_block = block_child.delete(i)
+       
+    transf_pragma_block = build_pragma_block(pragma_block,num_funcs,c_struct_name,var_names)
+    pg_array.insert(p_index+1,transf_pragma_block)
 
-         if a == "omp_get_num_threads()"
-          v.children[2] = "NUM_THREADS"
-           b = v.children[1]
-           if b == "omp_get_thread_num()"
-             v.children[1] = "tid"
-           end
-         end 
+    
+    point = index
+   
+    stmts.each do |i|
+    block_child.insert(point,i)
+    point = point + 1
     end
 
-
+  end
+     
+  if g.eql?(:ParallelPragmaBlock)
+    change_omp_values(i)    
     num_funcs = num_funcs + 1
     stmts = generate_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
     index = block_child.index(i)
@@ -164,16 +164,27 @@ def pragma_codegen(s,p_index,pg_array)
     block_child.insert(point,i)
     point = point + 1
     end
-   end
-   #exit_stmt = :FunctionCall \
-   #            ["pthread_exit" \
-   #            ,[:ConstString["NULL"]]]
-   #block_child.push(exit_stmt)
+  end
   end 
 return pg_array
 end
 
 
+def change_omp_values(i)
+ i.child(0).each do |l|
+        v = l.child(1)
+              
+        a = v.children[2]
+
+         if a == "omp_get_num_threads()"
+          v.children[2] = "NUM_THREADS"
+           b = v.children[1]
+           if b == "omp_get_thread_num()"
+             v.children[1] = "tid"
+           end
+         end 
+  end
+end
 
 class DataCreate
   include RubyWrite
@@ -245,10 +256,8 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   b_n = :Block
   
   block_child = Array.new
-  var_type_n = :TypeDecls
+  var_type_n = :NewtypeDecls
 
-
- 
   
   pthread_arg_stmt = Array.new
   pthread_type_n = :TypeDecls
@@ -307,15 +316,96 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   block_child.push(exit_stmt)
   pg_child.push(func)
   res = pg_n[pg_child]
-  #DataVarChange.run res
-  #res.prettyprint STDOUT
-  #exit
+
   return res
   
   
 end
 
 
+def generate_critical_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
+  stmt_list = Array.new
+
+  main_struct_name = "arg_struct"+"_"+num_f.to_s
+  stmt_3 = :TypeDecls[struct_name_for_typ,main_struct_name]
+  stmt_list.push(stmt_3)      
+
+
+  struct_decl_num = 0
+  struct_var_decl = main_struct_name+"." 
+  
+  n = 0
+  var_names.each do |i|
+  struct_var_decl_with_var = struct_var_decl+i.to_s
+  struct_assign_stmt= :Assignment[struct_var_decl_with_var ,:Variable[i]]
+  #:ConstInt["3"]]
+  stmt_list.push(struct_assign_stmt) 
+  n = n + 1
+  end
+   
+  for_array_first_stmts = Array.new
+  for_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]]\
+                  ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
+                :Variable["NUM_THREADS"  ] ]  \
+              ,:Assignment["i" \
+           ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
+             ,:ConstInt[  "1"  ] ]],for_array_first_stmts ]
+
+
+  for_stmt_1 = :Assignment[:ArrayDef[\
+                        "thread_args" ,:Variable[ "i"]],\
+                       :Variable["i"]]
+
+
+  struct_var_tid = struct_var_decl+"threads_id"
+  struct_tid_assign_stmt= :Assignment[struct_var_tid,:ArrayDef[\
+                        "thread_args" ,:Variable[ "i"]]]
+
+ 
+  #struct_tid_var_decl = struct_var_decl+"threads_args[i] "
+
+
+   for_stmt_2 = :FunctionCall[ \
+             "printf"  ,[:ConstString[ "\"Inside main:creating thread %d\\n\""  ] \
+             ,:Variable[   "i"  ] ]]
+
+
+
+  for_array_first_stmts.push(for_stmt_1)
+  for_array_first_stmts.push(struct_tid_assign_stmt) 
+  for_array_first_stmts.push(for_stmt_2)
+  #for_array_first_stmts.push(for_stmt_3)          
+  for_stmt_thread = "for_stmt_th"
+  stmt_nums = 0
+  #var_names.each do |i|
+      
+  #each_for =  for_stmt_thread+i
+  each_for  = :Assignment["rc" ,:FunctionCall \
+                                    ["pthread_create" \
+                                 ,[:UnaryOp["&",:ArrayDef[\
+                                    "threads", \
+                                   :Variable["i"]]] \
+                               , :ConstString [ \
+                                 "NULL"] \
+                               ,:ConstString [ \
+                                 "Test"+num_f.to_s] \
+                         ,"(void *)"+" &" +main_struct_name]]]  
+   for_array_first_stmts.push(each_for)         
+    for_join_th_stmt_1 = :Assignment["rc" ,:FunctionCall \
+               ["pthread_join" \
+               ,[:ArrayDef[\
+                     "threads", \
+                     :Variable["i"]] \
+                  , :ConstString [ \
+                       "NULL"] ]]]
+
+  for_array_first_stmts.push(for_join_th_stmt_1)
+   #end
+
+  stmt_list.push(for_stmt)
+  #stmt_list.push(for_j_stmt)
+  return stmt_list
+end
 
 def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
   stmt_list = Array.new
@@ -358,10 +448,6 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
   struct_tid_assign_stmt= :Assignment[struct_var_tid,:ArrayDef[\
                         "thread_args" ,:Variable[ "i"]]]
 
- 
-  #:Variable["tid_vals"]]
-  #struct_tid_var_decl = struct_var_decl+"threads_args[i] "
-
 
    for_stmt_2 = :FunctionCall[ \
              "printf"  ,[:ConstString[ "\"Inside main:creating thread %d\\n\""  ] \
@@ -391,20 +477,7 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
    for_array_first_stmts.push(each_for)         
    #end
 
-=begin
-    thread_num_stmt  = :Assignment["rc" ,:FunctionCall \
-                                 ["pthread_create" \
-                          ,[:UnaryOp["&",:ArrayDef[\
-                                 "threads", \
-                               :Variable["i"]]] \
-                               , :ConstString [ \
-                               "NULL"] \
-                              ,:ConstString [ \
-                             "Test"+num_f.to_s] \
-           ,"(void *)"+" &" +main_struct_name+"."+"threads_id"]]]
-    
-  for_array_first_stmts.push(thread_num_stmt)  
-=end
+
   for_array_join_stmts = Array.new
   for_j_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]           ]    ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
                 :Variable["NUM_THREADS"  ] ]  \
@@ -412,8 +485,7 @@ def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
            ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
              ,:ConstInt[  "1"  ] ]],for_array_join_stmts ]
 
- #for_j_stmt.prettyprint STDOUT 
- #exit
+
  for_join_th_stmt_1 = :Assignment["rc" ,:FunctionCall \
                ["pthread_join" \
                ,[:ArrayDef[\
@@ -827,6 +899,10 @@ class UnparsePidginC
       rule :TypeDecls do |type ,vars|
         h({:hs => 0}, type, ' ' , vars , ';')
       end
+      rule :NewtypeDecls do |type ,vars|
+        h({:hs => 0}, type, ' ' , vars )
+      end
+      
       rule :Assignment do |lhs,rhs|
         h({:hs => 1}, lhs,'=', rhs,';')
       end
@@ -919,7 +995,10 @@ class UnparsePidginC
       rule :Struct_end  do |s_e|
         h({},*s_e,';')
       end
-
+      rule :CriticalPragmaBlock do | cblock| 
+        v({ },
+          v({ }, *cblock.children) ,)
+      end
       rule :ParallelPragmaBlock do |  pblock| 
          v({ },
             v({ }, *pblock.children) ,)
