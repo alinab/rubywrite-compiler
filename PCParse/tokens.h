@@ -33,7 +33,8 @@
 #define DEFINE 289
 #define NUM_THREADS 290
 #define STDLIB 291
-#define END_OF_INPUT 292
+#define CRITICAL 292
+#define END_OF_INPUT 293
 
 #ifdef _INCLUDED_FROM_SCANNER_
 const char* token_name[] = {
@@ -71,6 +72,7 @@ const char* token_name[] = {
   "DEFINE",
   "NUM_THREADS",
   "STDLIB",
+  "CRITICAL",
   "END_OF_INPUT",
 
 };

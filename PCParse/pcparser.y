@@ -139,6 +139,7 @@ function_def:
   | pointer_decl {result = val[0] }
   | fn_decl
   | '#' PRAGMA OMP PARALLEL '{' stmt_list '}' { result = :ParallelPragmaBlock[val[5]] }
+  | '#' PRAGMA OMP CRITICAL '{' stmt_list '}' { result = :CriticalPragmaBlock[val[5]] } 
   ;
 
 

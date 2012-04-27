@@ -163,6 +163,9 @@ stdlib {
   return STDLIB;
 }
 
+critical {
+  return CRITICAL;
+}
 
 %{
   /* Operators.  Since '*', '+', and '-' are also unary operators these are
