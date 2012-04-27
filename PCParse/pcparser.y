@@ -153,14 +153,14 @@ function_def:
   | RETURN  { result = :ReturnStmt[] }
   | RETURN expr  { result = :ReturnStmt[val[1]] }
   | function_call
-/*  | expr { result = val[0] }*/
+  | expr { result = val[0] }
   | pointer_decl '=' expr { result = :PointerVal[val[0] ,val[2]] }
   | lval '=' '&' expr { result = :PointerRef[val[0],val[3]] }
   ;
   
  /* Rules for compound statements */
   compound_stmt:
-    FOR '(' expr  ';' expr ';' expr  ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
+    FOR '(' simple_stmt  ';' expr ';' simple_stmt  ')' '{' stmt_list '}' { result = :For[val[0],val[2],val[4],val[6],val[9]] }
   | WHILE '(' simple_stmt ')' block  { result = [val[0],val[2],val[4]] }
   | IF '(' simple_stmt ')' block  optional_else  { result = :IfStmt[val[2] ,val[4] ,val[5]] }
   ;
