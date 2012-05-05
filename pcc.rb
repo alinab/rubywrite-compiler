@@ -76,7 +76,7 @@ def pragma_codegen(s,p_index,pg_array)
   len =  var_types.length
   #print var_names,"\n"
   #print var_types,"\n"
-  #exit
+ exit
   
   c_struct_node  = :Struct
   c_struct_main =  Array.new #:Struct_name #["st_data"
@@ -158,11 +158,12 @@ def pragma_codegen(s,p_index,pg_array)
     end
 
   end
-     
-  if g.eql?(:ParallelPragmaBlock)
+
+  if g.eql?(:DynamicForPragmaBlock)
     change_omp_values(i)    
     num_funcs = num_funcs + 1
-    stmts = generate_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
+    exit
+    stmts = generate_critical_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
     index = block_child.index(i)
     #print "index = ",index,"\n"
     pragma_block = block_child.delete(i)
@@ -178,8 +179,28 @@ def pragma_codegen(s,p_index,pg_array)
     point = point + 1
     end
   end
+     
+    if g.eql?(:ParallelPragmaBlock)
+    change_omp_values(i)    
+      num_funcs = num_funcs + 1
+      stmts = generate_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
+      index = block_child.index(i)
+      #print "index = ",index,"\n"
+    pragma_block = block_child.delete(i)
+       
+    transf_pragma_block = build_pragma_block(pragma_block,num_funcs,c_struct_name,var_names)
+    pg_array.insert(p_index+1,transf_pragma_block)
+
+    
+    point = index
+   
+    stmts.each do |i|
+    block_child.insert(point,i)
+    point = point + 1
+    end
+  end
   end 
-return pg_array
+  return pg_array
 end
 
 
