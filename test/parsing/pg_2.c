@@ -45,11 +45,11 @@ void swapNum(int i, int j){
 int last(int p ,int q, int *r)
 {
   int n;
-    int i;
-    for(n = 0; n < 10 ;n = n + 1) {
-      i = i + p + q+r;
-      printf("%d\n",i);
-    }
+  int i;
+  for(n = 0; n < 10 ;n = n + 1) {
+    i = i + p + q+r;
+    printf("%d\n",i);
+ }
     return 0;
 }
 

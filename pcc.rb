@@ -56,15 +56,28 @@ def pragma_codegen(s,p_index,pg_array)
   var_types = Array.new
   block_child.each do |j|
     t_dcl_n,v_name=  return_node(j)
-    if (t_dcl_n.to_s).empty?
-       next
+    #print v_name,"\n"
+    if v_name.is_a? RubyWrite::Node
+       k = v_name.value
+       if  k.eql?(:ArrayDef)
+        e = v_name.child(0)
+        v_name = e
+        #print e,"\...n"
+       end
     end
+    if (t_dcl_n.to_s).empty?
+      next
+    end
+
     var_types.push(t_dcl_n.to_s)
     var_names.push(v_name.to_s)
-  
+   
   end
   len =  var_types.length
-
+  #print var_names,"\n"
+  #print var_types,"\n"
+  #exit
+  
   c_struct_node  = :Struct
   c_struct_main =  Array.new #:Struct_name #["st_data"
   c_struct_elem = ["typedef"," ","struct"," " ,"{"] ##
@@ -362,8 +375,6 @@ def generate_critical_block_to_insert_in_main(num_f,struct_name_for_typ,var_name
                         "thread_args" ,:Variable[ "i"]]]
 
  
-  #struct_tid_var_decl = struct_var_decl+"threads_args[i] "
-
 
    for_stmt_2 = :FunctionCall[ \
              "printf"  ,[:ConstString[ "\"Inside main:creating thread %d\\n\""  ] \
@@ -406,6 +417,9 @@ def generate_critical_block_to_insert_in_main(num_f,struct_name_for_typ,var_name
   #stmt_list.push(for_j_stmt)
   return stmt_list
 end
+
+
+
 
 def  generate_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
   stmt_list = Array.new
@@ -510,7 +524,7 @@ end
 def return_node(n)
   nodeName = n.value
   nodeChildren = n.children
-  
+
   case nodeName
   when  :Program 
     n.child(0).each do |i|
@@ -526,6 +540,11 @@ def return_node(n)
     t = n.child(0)
     n = n.child(1)
     return t,n
+  when  :ArrayDef
+    print "eeeee\n"
+    s = n.child(0)
+    u = n.child(1)
+    return s,u
    end
 end
 
@@ -914,7 +933,7 @@ class UnparsePidginC
       end
       rule :For do |init ,cond1,cond2,cond3, stmts|
         v({},
-          v({:is => 2}, h({:hs => 1},init,'(',cond1,';',cond2,';',cond3,')'),'{',
+          v({:is => 2}, h({:hs => 1},init,'(',cond1,cond2,';',cond3,')'),'{',
             v({} ,*stmts),'}'))
       end
       rule :WhileStmt do |expr, stmts|
@@ -945,12 +964,15 @@ class UnparsePidginC
       rule :PointerVal do |pointer_var|
         h({},'*', pointer_var)
       end
-      rule :ArrayDef do |name,args|
-        h({},name,'[',*args,']')
+      rule :ArrayDef do |name,val|
+        h({},name,'[',*val,']')
       end
       #rule :FunctionCall do |func, args|
       #  h({}, func, "(", args, ")")
       #end
+      rule :ArrayDecl do |name,val|
+        h({},'[',val,']')
+      end
       rule :Formals do |args|
         v({},' ' , *args.children)
       end
@@ -974,7 +996,7 @@ class UnparsePidginC
       end
       rule :FunctionCall do |func_call ,args|
         h({}, *func_call ,"(" ,
-          h_star({:hs => 1},',' ,*args.children ) ,");")
+          h_star({:hs => 1},',' ,*args.children ) ,")",';')
       end
       rule :Variable  do |var|
         h({}, var)
@@ -994,6 +1016,10 @@ class UnparsePidginC
       end
       rule :Struct_end  do |s_e|
         h({},*s_e,';')
+      end
+      rule :DynamicForPragmaBlock do | forpblock| 
+         v({ },
+            v({ }, *forpblock.children) ,)
       end
       rule :CriticalPragmaBlock do | cblock| 
         v({ },
