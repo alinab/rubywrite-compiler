@@ -140,10 +140,12 @@ function_def:
   | fn_decl
   | '#' PRAGMA OMP PARALLEL '{' stmt_list '}' { result = :ParallelPragmaBlock[val[5]] }
   | '#' PRAGMA OMP CRITICAL '{' stmt_list '}' { result = :CriticalPragmaBlock[val[5]] } 
-  | '#' PRAGMA OMP SECTIONS  '{' stmt_list '}' { result = :SectionsPragmaBlock[val[5]] } 
-  | '#' PRAGMA OMP SECTION   '{' stmt_list '}' { result = :SectionBlock[val[5]] } 
+/*  | '#' PRAGMA OMP SECTIONS  '{' stmt_list '}' { result = :SectionsPragmaBlock[val[5]] } 
+    | '#' PRAGMA OMP SECTION   '{' stmt_list '}' { result = :SectionBlock[val[5]] } */
+  | '#' PRAGMA OMP FOR   '{' stmt_list '}' { result = :ForPragmaBlock[val[5]] } 
+| '#' PRAGMA OMP FOR SCHEDULE '(' STATIC ',' INT_NUM ')' '{' stmt_list '}' { result = :StaticForPragmaBlock[val[6],val[8],val[11]] } 
+| '#' PRAGMA OMP FOR SCHEDULE '(' DYNAMIC ',' INT_NUM ')' '{' stmt_list '}' { result = :DynamicForPragmaBlock[val[6],val[8],val[11]] } 
   ;
-
 
 /*Added rule for statements with pointer assignments */
     simple_stmt:

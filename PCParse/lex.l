@@ -167,6 +167,30 @@ critical {
   return CRITICAL;
 }
 
+sections {
+ return SECTIONS;
+}
+
+section {
+  return SECTION;
+}
+
+schedule {
+  return SCHEDULE;
+}
+
+dynamic {
+  return DYNAMIC;
+}
+
+static {
+  return STATIC;
+}
+
+chunk {
+  return CHUNK;
+}
+
 %{
   /* Operators.  Since '*', '+', and '-' are also unary operators these are
      returned as individual tokens. */
