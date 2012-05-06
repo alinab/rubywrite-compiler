@@ -143,9 +143,15 @@ function_def:
 /*  | '#' PRAGMA OMP SECTIONS  '{' stmt_list '}' { result = :SectionsPragmaBlock[val[5]] } 
     | '#' PRAGMA OMP SECTION   '{' stmt_list '}' { result = :SectionBlock[val[5]] } */
   | '#' PRAGMA OMP FOR   '{' stmt_list '}' { result = :ForPragmaBlock[val[5]] } 
-| '#' PRAGMA OMP FOR SCHEDULE '(' STATIC ',' INT_NUM ')' '{' stmt_list '}' { result = :StaticForPragmaBlock[val[6],val[8],val[11]] } 
-| '#' PRAGMA OMP FOR SCHEDULE '(' DYNAMIC ',' INT_NUM ')' '{' stmt_list '}' { result = :DynamicForPragmaBlock[val[11]] } 
+| '#' PRAGMA OMP FOR SCHEDULE '(' STATIC ',' chunk ')' '{' stmt_list '}' { result = :StaticForPragmaBlock[val[8],val[11]] } 
+| '#' PRAGMA OMP FOR SCHEDULE '(' DYNAMIC ',' chunk ')' '{' stmt_list '}' { result = :DynamicForPragmaBlock[val[8],val[11]] } 
   ;
+
+
+  chunk:
+  INT_NUM { result = :ConstInt[val[0]] }
+  ;
+
 
 /*Added rule for statements with pointer assignments */
     simple_stmt:

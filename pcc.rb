@@ -56,7 +56,6 @@ def pragma_codegen(s,p_index,pg_array)
   var_types = Array.new
   block_child.each do |j|
     t_dcl_n,v_name=  return_node(j)
-    #print v_name,"\n"
     if v_name.is_a? RubyWrite::Node
        k = v_name.value
        if  k.eql?(:ArrayDef)
@@ -64,7 +63,6 @@ def pragma_codegen(s,p_index,pg_array)
         p = v_name.child(1)
         d = p.child(0) #Ugly hack to get the array length
         v_name = e+'['+d+']'
-        #print p,d,"\...n"
        end
     end
     if (t_dcl_n.to_s).empty?
@@ -76,9 +74,7 @@ def pragma_codegen(s,p_index,pg_array)
    
   end
   len =  var_types.length
-  #print var_names,"\n"
-  #print var_types,"\n"
-  #exit
+
   c_struct_node  = :Struct
   c_struct_main =  Array.new #:Struct_name #["st_data"
   c_struct_elem = ["typedef"," ","struct"," " ,"{"] ##
@@ -98,13 +94,28 @@ def pragma_codegen(s,p_index,pg_array)
   end
 
   struct_mem_tid = Array.new
+  struct_mem_loop = Array.new
+
   thread_id_data_type = "int"
   thread_id_data_name = "threads_id"
+  loop_count_data_type = "int"
+  loop_count_data_name = "loop_count"
+
+  
   struct_mem_tid.push(thread_id_data_type)
   struct_mem_tid.push(' ')
   struct_mem_tid.push(thread_id_data_name)  
+
+  struct_mem_loop.push(loop_count_data_type)
+  struct_mem_loop.push(' ')
+  struct_mem_loop.push(loop_count_data_name)  
+
+  
+  struct_loop_count_var = :Struct_assign[struct_mem_loop]
   struct_sentence_tid = :Struct_assign[struct_mem_tid]
+
   c_struct_main.push(struct_sentence_tid)
+  c_struct_main.push(struct_loop_count_var)
 
   struct_name_for_typ = "data_struct"
   
@@ -160,16 +171,18 @@ def pragma_codegen(s,p_index,pg_array)
 
   end
 
-  if g.eql?(:DynamicForPragmaBlock)
-    change_omp_values(i)    
+  if g.eql?(:StaticForPragmaBlock)
+   
+    chunkval = i.child(0)
+    change_omp_values_for_pragma(i)    
     num_funcs = num_funcs + 1
     stmts = generate_for_dynamic_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
     index = block_child.index(i)
-    #print "index = ",index,"\n"
     pragma_block = block_child.delete(i)
        
-    transf_pragma_block = build_pragma_for_block(pragma_block,num_funcs,c_struct_name,var_names,var_types)
+    transf_pragma_block = build_pragma_for_block(pragma_block,num_funcs,c_struct_name,var_names,var_types,chunkval)
     pg_array.insert(p_index+1,transf_pragma_block)
+
     point = index
     stmts.each do |i|
     block_child.insert(point,i)
@@ -178,11 +191,10 @@ def pragma_codegen(s,p_index,pg_array)
   end
      
     if g.eql?(:ParallelPragmaBlock)
-    change_omp_values(i)    
+      change_omp_values(i)    
       num_funcs = num_funcs + 1
       stmts = generate_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
       index = block_child.index(i)
-      #print "index = ",index,"\n"
     pragma_block = block_child.delete(i)
        
     transf_pragma_block = build_pragma_block(pragma_block,num_funcs,c_struct_name,var_names)
@@ -201,8 +213,24 @@ def pragma_codegen(s,p_index,pg_array)
 end
 
 
+def change_omp_values_for_pragma(i)
+   i.child(1).each do |l|
+        v = l.child(1)
+              
+        a = v.children[2]
+
+         if a == "omp_get_num_threads()"
+          v.children[2] = "NUM_THREADS"
+           b = v.children[1]
+           if b == "omp_get_thread_num()"
+             v.children[1] = "tid"
+           end
+         end 
+  end
+end
+
 def change_omp_values(i)
- i.child(0).each do |l|
+   i.child(0).each do |l|
         v = l.child(1)
               
         a = v.children[2]
@@ -240,21 +268,14 @@ end
 
 class DataVarChange
   include RubyWrite
-  define_rw_method :main do  |node|
-    alltd?  node  do |n|
-      if match? :FunctionCall[:_],n
-        v = n.child(0)
-        print v,">---\n"
-        if v.instance_of? :Variable 
-        print "----------------"
-        print v,"<-here\n" 
-        end
-      else
-        false
-      end
-    end  
-  end
+  define_rw_rewriter :main do 
+      rewrite  :Assignment[:e,:w] do |node|
+       build  :Assignment[:e ,"loop_start"]
+    end
+  end  
 end
+
+
 
 
 
@@ -342,7 +363,7 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
 
   thread_info_stmt = :FunctionCall["printf" \
                                    ,[:ConstString[\
-                         "\"The thread currently running is : %d \""],
+                         "\"The thread currently running is : %d \" \n"],
                                    :Variable[pthread_ret_name]]]
 
   
@@ -368,7 +389,7 @@ end
 
 
 
-def build_pragma_for_block(pragma,num_f,c_struct_name,var_names,var_types)
+def build_pragma_for_block(pragma,num_f,c_struct_name,var_names,var_types,chunkval)
   pg_n = :Program
   pg_child = Array.new
 
@@ -418,40 +439,73 @@ def build_pragma_for_block(pragma,num_f,c_struct_name,var_names,var_types)
   thread_loop_stmt.push(thread_loop_ret_name)
   loop_var_type_decl = loop_var_type_n[thread_loop_stmt]
 
+
   pth_type_decl = pthread_type_n[pthread_arg_stmt]
   block_child.push(pth_type_decl)
   block_child.push(loop_var_type_decl)
- 
+
+  
+  lp_l = 0
   var_names.each do |i|
    if i.match('\[')
+     k = i
+     lp_l = k.slice(2..3)
      array_stmt = Array.new
      array_var_type_n = :TypeDecls
 
      ind = var_names.index(i)
      retv = var_types.fetch(ind)
      array_ret_type = retv
-     array_ret_name = i
+     array_ret_name = i #Using default chunk value as 1 so as to have one iterartion each time a thread runs
      array_stmt.push(array_ret_type)
      array_stmt.push(array_ret_name)
      for_array_type_decl = array_var_type_n[array_stmt]
      block_child.push(for_array_type_decl)
    end
-  end  
 
+  end  
+ 
+  block_child.push(:TypeDecls["int","loop_len"])
+  block_child.push(:TypeDecls["int","loop_size"])
+  block_child.push(:TypeDecls["int","loop_start"])
+  block_child.push(:TypeDecls["int","end_val"])
+  loop_length =  :Assignment[:Variable["loop_len"], \
+                   lp_l]
+  loop_size = :Assignment[:Variable["loop_size"], \
+             :BinaryOp[:Variable[ "loop_len" ]  ,"/" ,\
+                :Variable["NUM_THREADS"]]]
+
+  each_loop_ite_ret = :TypeDecls["int","loop_count"]
+  loop_ite = :Assignment[:Variable["loop_count"],"((data_struct *) args)->"+"loop_count"]
+
+  block_child.push(each_loop_ite_ret)
+  block_child.push(loop_length)
+  block_child.push(loop_size)
+  block_child.push(loop_ite)
+
+ end_val = :Assignment[:Variable["end_val"],\
+           :BinaryOp["loop_start",'+',"loop_size"]]
+  block_child.push(end_val)
+
+
+  loop_start = :Assignment["loop_start",:BinaryOp["loop_count","*","loop_size"]]
+  block_child.push(loop_start)
 
   var_names.each do |i|
    if i.match('\[')
-     loop_len = 20
+     loop_len = #chunkval #20
      #print e,"\n"
   for_array_decl_stmts = Array.new
   for_array_var_type_n = :TypeDecls
-
-  for_stmt = :For["for" ,:Assignment[thread_loop_ret_name  ,:ConstInt[ "0" ]]\
+ 
+  
+  for_stmt = :For["for" ,:Assignment[thread_loop_ret_name , :Variable["loop_start"]]\
                   ,:BinaryOp[thread_loop_ret_name  ,"<" ,\
-                :Variable[loop_len] ]  \
+                :Variable["end_val"] ]  \
               ,:Assignment[thread_loop_ret_name \
            ,:BinaryOp[thread_loop_ret_name ,"+" \
              ,:ConstInt["1"] ]],for_array_decl_stmts ]
+          #trying chunkval instead of loop_len
 
      u = i.sub(/[0]/,'')
      v = u.sub(/[1-9]/,'e')
@@ -485,7 +539,10 @@ def build_pragma_for_block(pragma,num_f,c_struct_name,var_names,var_types)
     end
   end
   #print pt_var_stmt,"\n"
-  
+
+  each_loop_len = :Assignment[:Variable["n"],:Variable["end_val"]]
+
+  block_child.push(each_loop_len)                
   pt_var_tid = pt_to_struct + "threads_id"#var_names[0].to_s
   pt_var_stmt_tid = :Assignment[:Variable["tid"],pt_var_tid]
   block_child.push(pt_var_stmt_tid)
@@ -503,7 +560,16 @@ def build_pragma_for_block(pragma,num_f,c_struct_name,var_names,var_types)
   func_child.push(block) 
 
 
+  #Rewrite pragma to change .
+
+  c = pragma.child(1)
+  c.each do |w|
+   a = w.child(1)
+   DataVarChange.run a
+    end
+
   block_child.push(pragma)
+  
   exit_stmt = :FunctionCall \
                ["pthread_exit" \
                ,[:ConstString["NULL"]]]
@@ -643,6 +709,7 @@ def generate_for_dynamic_block_to_insert_in_main(num_f,struct_name_for_typ,var_n
   n = n + 1
   end
    
+  loop_var_static = "loop_count"
   for_array_first_stmts = Array.new
   for_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]]\
                   ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
@@ -657,6 +724,9 @@ def generate_for_dynamic_block_to_insert_in_main(num_f,struct_name_for_typ,var_n
                        :Variable["i"]]
 
 
+  for_stmt_loop = :Assignment[main_struct_name+'.'+loop_var_static,    :Variable["i"]]
+
+   
   struct_var_tid = struct_var_decl+"threads_id"
   struct_tid_assign_stmt= :Assignment[struct_var_tid,:ArrayDef[\
                         "thread_args" ,:Variable[ "i"]]]
@@ -670,6 +740,7 @@ def generate_for_dynamic_block_to_insert_in_main(num_f,struct_name_for_typ,var_n
 
 
   for_array_first_stmts.push(for_stmt_1)
+  for_array_first_stmts.push(for_stmt_loop)
   for_array_first_stmts.push(struct_tid_assign_stmt) 
   for_array_first_stmts.push(for_stmt_2)
   #for_array_first_stmts.push(for_stmt_3)          
@@ -689,19 +760,28 @@ def generate_for_dynamic_block_to_insert_in_main(num_f,struct_name_for_typ,var_n
                                  "Test"+num_f.to_s] \
                          ,"(void *)"+" &" +main_struct_name]]]  
    for_array_first_stmts.push(each_for)         
-    for_join_th_stmt_1 = :Assignment["rc" ,:FunctionCall \
+
+    for_array_join_stmts = Array.new
+  for_j_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]           ]    ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
+                :Variable["NUM_THREADS"  ] ]  \
+              ,:Assignment["i" \
+           ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
+             ,:ConstInt[  "1"  ] ]],for_array_join_stmts ]
+
+
+ for_join_th_stmt_1 = :Assignment["rc" ,:FunctionCall \
                ["pthread_join" \
                ,[:ArrayDef[\
                      "threads", \
                      :Variable["i"]] \
                   , :ConstString [ \
                        "NULL"] ]]]
-
-  for_array_first_stmts.push(for_join_th_stmt_1)
-   #end
+   
+  
+  for_array_join_stmts.push(for_join_th_stmt_1)
 
   stmt_list.push(for_stmt)
-  #stmt_list.push(for_j_stmt)
+  stmt_list.push(for_j_stmt)
   return stmt_list
 end
 
@@ -827,7 +907,7 @@ def return_node(n)
     n = n.child(1)
     return t,n
   when  :ArrayDef
-    print "eeeee\n"
+    #print "eeeee\n"
     s = n.child(0)
     u = n.child(1)
     return s,u
@@ -1129,7 +1209,7 @@ end
 def codegen_func_call(node)
    name = node.child(0)
 #  func_list =  $testMod.functions 
-   print name
+   #print name
   return 
 end  
 
@@ -1303,7 +1383,7 @@ class UnparsePidginC
       rule :Struct_end  do |s_e|
         h({},*s_e,';')
       end
-      rule :DynamicForPragmaBlock do | forpblock| 
+      rule :StaticForPragmaBlock do |chunk,forpblock| 
          v({ },
             v({ }, *forpblock.children) ,)
       end
