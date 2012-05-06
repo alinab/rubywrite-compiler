@@ -61,8 +61,10 @@ def pragma_codegen(s,p_index,pg_array)
        k = v_name.value
        if  k.eql?(:ArrayDef)
         e = v_name.child(0)
-        v_name = e
-        #print e,"\...n"
+        p = v_name.child(1)
+        d = p.child(0) #Ugly hack to get the array length
+        v_name = e+'['+d+']'
+        #print p,d,"\...n"
        end
     end
     if (t_dcl_n.to_s).empty?
@@ -76,8 +78,7 @@ def pragma_codegen(s,p_index,pg_array)
   len =  var_types.length
   #print var_names,"\n"
   #print var_types,"\n"
- exit
-  
+  #exit
   c_struct_node  = :Struct
   c_struct_main =  Array.new #:Struct_name #["st_data"
   c_struct_elem = ["typedef"," ","struct"," " ,"{"] ##
@@ -162,18 +163,14 @@ def pragma_codegen(s,p_index,pg_array)
   if g.eql?(:DynamicForPragmaBlock)
     change_omp_values(i)    
     num_funcs = num_funcs + 1
-    exit
-    stmts = generate_critical_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
+    stmts = generate_for_dynamic_block_to_insert_in_main(num_funcs,struct_name_for_typ,var_names)
     index = block_child.index(i)
     #print "index = ",index,"\n"
     pragma_block = block_child.delete(i)
        
-    transf_pragma_block = build_pragma_block(pragma_block,num_funcs,c_struct_name,var_names)
+    transf_pragma_block = build_pragma_for_block(pragma_block,num_funcs,c_struct_name,var_names,var_types)
     pg_array.insert(p_index+1,transf_pragma_block)
-
-    
     point = index
-   
     stmts.each do |i|
     block_child.insert(point,i)
     point = point + 1
@@ -310,7 +307,14 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   var_ret_type = "int"
   var_names.each do |i|
     var_arg_stmt = Array.new
+  #  p = i;
+  # if i.match('\[')
+  #   e = p.chr
+  #   i = e
+  # end  #Hack to make references work 
+
     var_ret_name = '&'+i.to_s
+  #  i = p
     var_arg_stmt.push(var_ret_type)
     var_arg_stmt.push(var_ret_name)
     #print var_arg_stmt,"\n"
@@ -318,6 +322,12 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
     #block_child.push(var_type_decl)
   #end
   #var_names.each do |i|
+  if i.match('\[')
+     e = i.sub(/[0]/,'')
+     j = e.sub(/[1-9]/,'0')
+     #print j,"\n..."
+     i = j
+  end
   pt_var = pt_to_struct + i#var_names[0].to_s
   pt_to_var = '&'+i.to_s
   pt_var_stmt = :Assignment[var_type_decl,pt_var]
@@ -355,6 +365,158 @@ def build_pragma_block(pragma,num_f,c_struct_name,var_names)
   
   
 end
+
+
+
+def build_pragma_for_block(pragma,num_f,c_struct_name,var_names,var_types)
+  pg_n = :Program
+  pg_child = Array.new
+
+  func_child = Array.new
+  func_n = :Function
+  
+  func_ret_type = "void"
+  func_pthread_name = "*Test"+num_f.to_s
+  func_child.push(func_ret_type)
+  func_child.push(func_pthread_name)
+  func = func_n[func_child]
+
+  for_ret_type = "void * args"
+  #for_arg_name = "*args"
+
+  p_arg_n = :PointerDecl
+  p_arg_array = Array.new  
+  p_arg_array.push(for_ret_type)
+
+
+  formals = Array.new
+  formals.push(for_ret_type)
+  #formals.push(for_arg_name)
+  func_child.push(formals)
+  
+  b_n = :Block
+  
+  block_child = Array.new
+  var_type_n = :NewtypeDecls
+
+  
+  pthread_arg_stmt = Array.new
+  pthread_type_n = :TypeDecls
+
+  
+  pthread_ret_type = "int"
+  pthread_ret_name = "tid"
+  pthread_arg_stmt.push(pthread_ret_type)
+  pthread_arg_stmt.push(pthread_ret_name)
+
+  thread_loop_stmt = Array.new
+  loop_var_type_n = :TypeDecls
+
+  thread_loop_ret_type = "int"
+  thread_loop_ret_name = "e"
+  thread_loop_stmt.push(thread_loop_ret_type)
+  thread_loop_stmt.push(thread_loop_ret_name)
+  loop_var_type_decl = loop_var_type_n[thread_loop_stmt]
+
+  pth_type_decl = pthread_type_n[pthread_arg_stmt]
+  block_child.push(pth_type_decl)
+  block_child.push(loop_var_type_decl)
+ 
+  var_names.each do |i|
+   if i.match('\[')
+     array_stmt = Array.new
+     array_var_type_n = :TypeDecls
+
+     ind = var_names.index(i)
+     retv = var_types.fetch(ind)
+     array_ret_type = retv
+     array_ret_name = i
+     array_stmt.push(array_ret_type)
+     array_stmt.push(array_ret_name)
+     for_array_type_decl = array_var_type_n[array_stmt]
+     block_child.push(for_array_type_decl)
+   end
+  end  
+
+
+  var_names.each do |i|
+   if i.match('\[')
+     loop_len = 20
+     #print e,"\n"
+  for_array_decl_stmts = Array.new
+  for_array_var_type_n = :TypeDecls
+
+  for_stmt = :For["for" ,:Assignment[thread_loop_ret_name  ,:ConstInt[ "0" ]]\
+                  ,:BinaryOp[thread_loop_ret_name  ,"<" ,\
+                :Variable[loop_len] ]  \
+              ,:Assignment[thread_loop_ret_name \
+           ,:BinaryOp[thread_loop_ret_name ,"+" \
+             ,:ConstInt["1"] ]],for_array_decl_stmts ]
+
+     u = i.sub(/[0]/,'')
+     v = u.sub(/[1-9]/,'e')
+     pt_to_struct = "((data_struct *) args)->"
+
+     data_in_struct = pt_to_struct+v
+     array_var_stmt = :Assignment[v,data_in_struct]
+
+     for_array_decl_stmts.push(array_var_stmt)
+    block_child.push(for_stmt)   
+   end
+
+  end       
+
+  pt_to_struct = "((data_struct *) args)->"
+
+  var_ret_type = "int"
+  var_names.each do |i|
+    if !(i.match('\['))
+      var_arg_stmt = Array.new
+      
+      var_ret_name = '&'+i.to_s
+      var_arg_stmt.push(var_ret_type)
+      var_arg_stmt.push(var_ret_name)
+      var_type_decl = var_type_n[var_arg_stmt]
+  
+      pt_var = pt_to_struct + i#var_names[0].to_s
+      pt_to_var = '&'+i.to_s
+      pt_var_stmt = :Assignment[var_type_decl,pt_var]
+      block_child.push(pt_var_stmt)
+    end
+  end
+  #print pt_var_stmt,"\n"
+  
+  pt_var_tid = pt_to_struct + "threads_id"#var_names[0].to_s
+  pt_var_stmt_tid = :Assignment[:Variable["tid"],pt_var_tid]
+  block_child.push(pt_var_stmt_tid)
+  
+
+  thread_info_stmt = :FunctionCall["printf" \
+                                   ,[:ConstString[\
+                         "\"The thread currently running is : %d \""],
+                                   :Variable[pthread_ret_name]]]
+
+ 
+
+  block_child.push(thread_info_stmt)
+  block = b_n[block_child]
+  func_child.push(block) 
+
+
+  block_child.push(pragma)
+  exit_stmt = :FunctionCall \
+               ["pthread_exit" \
+               ,[:ConstString["NULL"]]]
+  block_child.push(exit_stmt)
+  pg_child.push(func)
+  
+  res = pg_n[pg_child]
+
+  return res
+  
+  
+end
+
 
 
 def generate_critical_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
@@ -439,6 +601,109 @@ def generate_critical_block_to_insert_in_main(num_f,struct_name_for_typ,var_name
   return stmt_list
 end
 
+
+
+def generate_for_dynamic_block_to_insert_in_main(num_f,struct_name_for_typ,var_names)
+  stmt_list = Array.new
+
+  main_struct_name = "arg_struct"+"_"+num_f.to_s
+  stmt_3 = :TypeDecls[struct_name_for_typ,main_struct_name]
+  stmt_list.push(stmt_3)      
+
+
+  struct_decl_num = 0
+  struct_var_decl = main_struct_name+"." 
+  
+ 
+  n = 0
+  var_names.each do |i|
+  struct_val_assign_array = Array.new
+    if i.match('\[')
+     e = i.sub(/[0]/,'')
+     j = e.sub(/[1-9]/,'i')
+     #print j,"\n..."
+     i = j
+    for_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]]\
+                  ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
+                :Variable["n"] ]  \
+              ,:Assignment["i" \
+           ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
+             ,:ConstInt[  "1"  ] ]], struct_val_assign_array]
+      
+  struct_var_decl_with_var = struct_var_decl+i.to_s
+  struct_assign_stmt= :Assignment[struct_var_decl_with_var ,:Variable[i]]
+  struct_val_assign_array.push(struct_assign_stmt)
+  stmt_list.push(for_stmt) 
+  next 
+  end
+
+  struct_var_decl_with_var = struct_var_decl+i.to_s
+  struct_assign_stmt= :Assignment[struct_var_decl_with_var ,:Variable[i]]
+  stmt_list.push(struct_assign_stmt) 
+  n = n + 1
+  end
+   
+  for_array_first_stmts = Array.new
+  for_stmt = :For["for" ,:Assignment["i"  ,:ConstInt[ "0" ]]\
+                  ,:BinaryOp[:Variable[ "i" ]  ,"<" ,\
+                :Variable["NUM_THREADS"  ] ]  \
+              ,:Assignment["i" \
+           ,:BinaryOp[  :Variable[  "i"  ] ,"+" \
+             ,:ConstInt[  "1"  ] ]],for_array_first_stmts ]
+
+
+  for_stmt_1 = :Assignment[:ArrayDef[\
+                        "thread_args" ,:Variable[ "i"]],\
+                       :Variable["i"]]
+
+
+  struct_var_tid = struct_var_decl+"threads_id"
+  struct_tid_assign_stmt= :Assignment[struct_var_tid,:ArrayDef[\
+                        "thread_args" ,:Variable[ "i"]]]
+
+ 
+
+   for_stmt_2 = :FunctionCall[ \
+             "printf"  ,[:ConstString[ "\"Inside main:creating thread %d\\n\""  ] \
+             ,:Variable[   "i"  ] ]]
+
+
+
+  for_array_first_stmts.push(for_stmt_1)
+  for_array_first_stmts.push(struct_tid_assign_stmt) 
+  for_array_first_stmts.push(for_stmt_2)
+  #for_array_first_stmts.push(for_stmt_3)          
+  for_stmt_thread = "for_stmt_th"
+  stmt_nums = 0
+  #var_names.each do |i|
+      
+  #each_for =  for_stmt_thread+i
+  each_for  = :Assignment["rc" ,:FunctionCall \
+                                    ["pthread_create" \
+                                 ,[:UnaryOp["&",:ArrayDef[\
+                                    "threads", \
+                                   :Variable["i"]]] \
+                               , :ConstString [ \
+                                 "NULL"] \
+                               ,:ConstString [ \
+                                 "Test"+num_f.to_s] \
+                         ,"(void *)"+" &" +main_struct_name]]]  
+   for_array_first_stmts.push(each_for)         
+    for_join_th_stmt_1 = :Assignment["rc" ,:FunctionCall \
+               ["pthread_join" \
+               ,[:ArrayDef[\
+                     "threads", \
+                     :Variable["i"]] \
+                  , :ConstString [ \
+                       "NULL"] ]]]
+
+  for_array_first_stmts.push(for_join_th_stmt_1)
+   #end
+
+  stmt_list.push(for_stmt)
+  #stmt_list.push(for_j_stmt)
+  return stmt_list
+end
 
 
 
